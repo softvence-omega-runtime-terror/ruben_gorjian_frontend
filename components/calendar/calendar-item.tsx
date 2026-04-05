@@ -102,9 +102,15 @@ export const CalendarItem = memo<CalendarItemProps>(
       dragRef(dragElementRef);
     }, [dragRef]);
 
-    const mediaUrl = post.asset?.storageKey
-      ? buildStorageUrl(STORAGE_BASE_URL, post.asset.storageKey)
-      : null;
+    const anyPost = post as any;
+    let mediaUrl = null;
+    if (post.asset?.storageKey) {
+      mediaUrl = buildStorageUrl(STORAGE_BASE_URL, post.asset.storageKey);
+    } else if (anyPost.media && anyPost.media.length > 0) {
+      mediaUrl = anyPost.media[0].url || buildStorageUrl(STORAGE_BASE_URL, anyPost.media[0].storageKey);
+    } else if (anyPost.assets && anyPost.assets.length > 0) {
+      mediaUrl = anyPost.assets[0];
+    }
 
     const platforms = post.targets.map((t) => t.platform);
     const primaryPlatform = platforms[0];
@@ -121,7 +127,7 @@ export const CalendarItem = memo<CalendarItemProps>(
     const { session } = useSessionContext();
     const isAdmin = session?.role === "ADMIN" || session?.role === "SUPER_ADMIN";
     const needsMedia = platforms.some(p => p === "INSTAGRAM" || p === "TIKTOK");
-    const isMissingContent = needsMedia && !post.asset && (!post.caption || post.caption.trim() === "");
+    const isMissingContent = needsMedia && !mediaUrl && (!post.caption || post.caption.trim() === "");
 
     return (
       <div

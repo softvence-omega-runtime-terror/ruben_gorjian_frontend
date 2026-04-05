@@ -75,8 +75,7 @@ export const CalendarColumn = memo<CalendarColumnProps>(
             ? pDate.format("YYYY-MM-DD HH:mm") ===
               getDate.format("YYYY-MM-DD HH:mm")
             : display === "week"
-              ? pDate.isSameOrAfter(getDate.startOf("hour")) &&
-                pDate.isBefore(getDate.endOf("hour"))
+              ? pDate.isSame(getDate, "hour")
               : pDate.isSame(getDate, "day");
         return check;
       });
@@ -85,14 +84,14 @@ export const CalendarColumn = memo<CalendarColumnProps>(
     // Allow current day in month view and current hour in day/week views.
     // Only block dates that are strictly in the past.
     const isBeforeNow = useMemo(() => {
-      const now = dayjs();
+      const now = userTimezone ? dayjs().tz(userTimezone) : dayjs();
       if (display === "month") {
         // Block only days strictly before today
         return getDate.startOf("day").isBefore(now.startOf("day"));
       }
       // For day/week, block hours strictly before the current hour
       return getDate.startOf("hour").isBefore(now.startOf("hour"));
-    }, [getDate, display]);
+    }, [getDate, display, userTimezone]);
 
     const list = useMemo(() => {
       if (showAll) {

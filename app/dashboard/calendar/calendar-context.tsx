@@ -530,8 +530,16 @@ export function CalendarProvider({
       fetchPosts();
     };
     socket.on("post:status_changed", handleStatus);
+    socket.on("post:updated", handleStatus);
+    socket.on("post:deleted", handleStatus);
+    socket.on("post:failed", handleStatus);
+    socket.on("post:published", handleStatus);
     return () => {
       socket.off("post:status_changed", handleStatus);
+      socket.off("post:updated", handleStatus);
+      socket.off("post:deleted", handleStatus);
+      socket.off("post:failed", handleStatus);
+      socket.off("post:published", handleStatus);
     };
   }, [socket, fetchPosts]);
 

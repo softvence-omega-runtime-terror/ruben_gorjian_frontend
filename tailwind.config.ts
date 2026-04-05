@@ -69,9 +69,8 @@ const config: Config = {
           to: { height: "0" },
         },
         shimmer: {
-          "100%": {
-            transform: "translateX(100%)",
-          },
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
         },
         glow: {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },

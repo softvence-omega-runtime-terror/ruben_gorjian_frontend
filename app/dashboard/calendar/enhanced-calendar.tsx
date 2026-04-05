@@ -323,7 +323,7 @@ function MonthView({
     "grid grid-rows-[62px_auto] gap-[4px] rounded-[10px] absolute start-0 top-0",
     wideMonth
       ? "[grid-template-columns:repeat(7,160px)] w-max h-full"
-      : "grid-cols-7 w-full h-full",
+      : "grid-cols-7 w-full h-full min-w-[700px]",
   );
 
   return (
@@ -743,30 +743,32 @@ export default function EnhancedCalendar() {
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex border border-slate-700 rounded-lg overflow-hidden">
+            <div className="flex border border-slate-700 rounded-lg overflow-hidden bg-slate-900/50">
               <Button
                 variant={display === "day" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setDisplay("day")}
                 className={clsx(
                   "rounded-none border-0",
-                  display === "day" && "bg-lime-400 text-black",
+                  display !== "day" && "text-slate-400 hover:text-slate-200 hover:bg-slate-800",
                 )}
                 title="Day view"
               >
                 <List className="h-4 w-4" />
+                <span className="ml-1 sm:ml-2">Day</span>
               </Button>
               <Button
                 variant={display === "week" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setDisplay("week")}
                 className={clsx(
-                  "rounded-none border-0",
-                  display === "week" && "bg-lime-400 text-black",
+                  "rounded-none border-0 border-l border-r border-slate-700",
+                  display !== "week" && "text-slate-400 hover:text-slate-200 hover:bg-slate-800",
                 )}
                 title="Week view"
               >
                 <Calendar className="h-4 w-4" />
+                <span className="ml-1 sm:ml-2">Week</span>
               </Button>
               <Button
                 variant={display === "month" ? "default" : "ghost"}
@@ -774,11 +776,12 @@ export default function EnhancedCalendar() {
                 onClick={() => setDisplay("month")}
                 className={clsx(
                   "rounded-none border-0",
-                  display === "month" && "bg-lime-400 text-black",
+                  display !== "month" && "text-slate-400 hover:text-slate-200 hover:bg-slate-800",
                 )}
                 title="Month view"
               >
                 <Grid className="h-4 w-4" />
+                <span className="ml-1 sm:ml-2">Month</span>
               </Button>
             </div>
 

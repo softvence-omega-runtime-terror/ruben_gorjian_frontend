@@ -131,9 +131,15 @@ export default function PostDetailsModal({
     }
   };
 
-  const mediaUrl = post?.asset?.storageKey
-    ? buildStorageUrl(STORAGE_BASE_URL, post.asset.storageKey)
-    : null;
+  const anyPost = post as any;
+  let mediaUrl = null;
+  if (post?.asset?.storageKey) {
+    mediaUrl = buildStorageUrl(STORAGE_BASE_URL, post.asset.storageKey);
+  } else if (anyPost?.media && anyPost.media.length > 0) {
+    mediaUrl = anyPost.media[0].url || buildStorageUrl(STORAGE_BASE_URL, anyPost.media[0].storageKey);
+  } else if (anyPost?.assets && anyPost.assets.length > 0) {
+    mediaUrl = anyPost.assets[0];
+  }
 
   // post.scheduledFor is already in user timezone (from calendar context)
   const scheduledDate = post?.scheduledFor ? dayjs(post.scheduledFor) : null;
@@ -216,7 +222,7 @@ export default function PostDetailsModal({
               {mediaUrl && (
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 overflow-hidden">
                   <div className="relative w-full aspect-video bg-slate-900">
-                    {post.asset?.type === "VIDEO" ? (
+                    {(post.asset?.type === "VIDEO" || (anyPost?.media && anyPost.media[0]?.mediaType === "VIDEO")) ? (
                       <video
                         src={mediaUrl}
                         controls

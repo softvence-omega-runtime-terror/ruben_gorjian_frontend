@@ -45,6 +45,7 @@ interface PostModalProps {
     hashtags?: string[];
   } | null;
   isAdmin?: boolean;
+  onPublish?: (payload: any) => Promise<void>;
 }
 
 type UploadedAsset = { id: string; storageKey: string; name?: string };
@@ -59,6 +60,7 @@ export default function PostModal({
   uploading = false,
   editingPost,
   isAdmin = false,
+  onPublish,
 }: PostModalProps) {
   const [caption, setCaption] = useState("");
   const [datetime, setDatetime] = useState("");
@@ -251,6 +253,37 @@ export default function PostModal({
     }
     if (requiresMedia && assetIds.length === 0) {
       setError("Instagram and TikTok require media to publish.");
+      return;
+    }
+
+    if (onPublish) {
+      // Delegate to parent (AdminPostsPage) which will save and publish 
+      setSubmitting(true);
+      setError(null);
+      try {
+        const hashtags = normalizeHashtags(hashtagsInput);
+        const platforms = Array.from(
+          new Set(
+            socialAccounts
+              .filter((acc) => selectedAccounts.includes(acc.id))
+              .map((acc) => acc.platform)
+          )
+        );
+        const scheduledDate = parseDateTimeLocal(datetime, userTimezone);
+        await onPublish({
+          caption: caption.trim() || ".",
+          scheduledFor: scheduledDate,
+          socialAccountIds: selectedAccounts,
+          platforms,
+          ...(assetIds.length > 0 ? { assetIds } : {}),
+          ...(hashtags.length > 0 ? { hashtags } : {}),
+        });
+        onClose();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to publish post");
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
 
@@ -454,11 +487,11 @@ export default function PostModal({
                 type="file"
                 accept="image/*,video/*"
                 multiple
-                disabled={isEditing}
+                disabled={isEditing && !isAdmin}
                 onChange={(e) => handleFiles(e.target.files)}
                 className={clsx(
                   "text-xs text-slate-200 file:mr-3 file:rounded-md file:border file:border-slate-700 file:bg-slate-800 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-100 hover:file:bg-slate-700",
-                  isEditing && "opacity-50 cursor-not-allowed"
+                  isEditing && !isAdmin && "opacity-50 cursor-not-allowed"
                 )}
               />
               <div className="mt-2 text-xs text-slate-400">
@@ -517,9 +550,9 @@ export default function PostModal({
                             name="asset"
                             value={asset.id}
                             checked={isSelected}
-                            disabled={isEditing}
+                            disabled={isEditing && !isAdmin}
                             onChange={() => {
-                              if (isEditing) return;
+                              if (isEditing && !isAdmin) return;
                               if (allowsMultipleMedia) {
                                 // Toggle selection for checkboxes
                                 setAssetIds((prev) =>
@@ -662,7 +695,7 @@ export default function PostModal({
                 ? "Update"
                 : "Schedule"}
           </Button>
-          {!isEditing && isAdmin && (
+          {(isAdmin || onPublish) && (
             <Button
               onClick={handlePublishNow}
               disabled={submitting}
