@@ -952,6 +952,64 @@ export default function AdminPage() {
               )}
             </div>
           )}
+
+          {/* ── Pagination Footer ── */}
+          {activityData && activityData.totalPages > 1 && (
+            <div className="mt-6 pt-5 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+              {/* Left: results info */}
+              <p className="text-[11px] font-semibold text-slate-500 tracking-wide">
+                Showing page{" "}
+                <span className="text-slate-300 font-black">{activityPage}</span>
+                {" "}of{" "}
+                <span className="text-slate-300 font-black">{activityData.totalPages}</span>
+                {" "}·{" "}
+                <span className="text-slate-300 font-black">{activityData.total}</span> total events
+              </p>
+
+              {/* Center: page number pills */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: activityData.totalPages }, (_, i) => i + 1).map((pg) => (
+                  <button
+                    key={pg}
+                    onClick={() => setActivityPage(pg)}
+                    disabled={activityLoading}
+                    className={`h-8 w-8 rounded-lg text-[11px] font-black transition-all duration-200 ${
+                      pg === activityPage
+                        ? "bg-gradient-to-br from-lime-400 to-emerald-500 text-slate-900 shadow-lg shadow-lime-400/20 scale-110"
+                        : "bg-slate-800/60 text-slate-400 border border-slate-700/50 hover:border-lime-400/40 hover:text-lime-300 hover:bg-slate-700/60"
+                    } disabled:cursor-not-allowed`}
+                  >
+                    {pg}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right: Prev / Next */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActivityPage(p => Math.max(1, p - 1))}
+                  disabled={activityLoading || activityPage <= 1}
+                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-700 bg-slate-800/60 text-[11px] font-black text-slate-300 uppercase tracking-widest transition-all duration-200 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-300 disabled:opacity-25 disabled:cursor-not-allowed"
+                >
+                  <svg className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Previous
+                </button>
+                <button
+                  onClick={() => setActivityPage(p => p + 1)}
+                  disabled={activityLoading || !activityData?.hasNextPage}
+                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-transparent bg-gradient-to-r from-lime-500/80 to-emerald-600/80 text-[11px] font-black text-white uppercase tracking-widest shadow-md shadow-lime-400/10 transition-all duration-200 hover:from-lime-400 hover:to-emerald-500 hover:shadow-lime-400/25 disabled:opacity-25 disabled:cursor-not-allowed disabled:shadow-none"
+                >
+                  Next Page
+                  <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
