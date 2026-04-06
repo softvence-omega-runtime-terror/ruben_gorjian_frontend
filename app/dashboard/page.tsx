@@ -966,7 +966,7 @@ function MetricCard({
         {loading ? (
           <div className="h-6 w-20 animate-pulse rounded bg-slate-700/60" />
         ) : (
-          <p className="text-2xl font-semibold text-white">{value ?? 0}</p>
+          <p className="text-xl font-semibold text-white">{value ?? 0}</p>
         )}
       </CardContent>
     </Card>
