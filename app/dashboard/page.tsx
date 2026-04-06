@@ -427,17 +427,23 @@ type DashboardOverview = {
     planCode: string;
     planCategory: string;
     status: string;
+    priceType: string;
     billingCycle: string;
     currentPeriodEnd: string;
     daysLeft: number;
+    postLimitType: string;
     postQuota: number;
+    visualQuota: number | null;
     platformLimit: number;
   };
   usage: {
+    periodStart: string;
+    periodEnd: string;
     postsUsed: number;
     postsRemaining: number;
     visualsUsed: number;
     visualsRemaining: number | null;
+    visualsBonus: number;
     platformsUsed: number;
     platformsRemaining: number;
   };
@@ -583,50 +589,45 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Plan & Usage */}
-      <Section title="Plan & Usage">
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            label="Plan Code"
-            value={overview?.plan.planCode}
-            loading={isLoading}
-          />
-          <MetricCard
-            label="Billing"
-            value={overview?.plan.billingCycle}
-            loading={isLoading}
-          />
-          <MetricCard
-            label="Days Left"
-            value={overview?.plan.daysLeft}
-            loading={isLoading}
-          />
-          <MetricCard
-            label="Status"
-            value={overview?.plan.status}
-            loading={isLoading}
-          />
+      {/* Plan Details */}
+      <Section title="Plan Details">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Plan Code" value={overview?.plan.planCode} loading={isLoading} />
+          <MetricCard label="Category" value={overview?.plan.planCategory} loading={isLoading} />
+          <MetricCard label="Status" value={overview?.plan.status} loading={isLoading} />
+          <MetricCard label="Price Type" value={overview?.plan.priceType} loading={isLoading} />
+          <MetricCard label="Billing Cycle" value={overview?.plan.billingCycle} loading={isLoading} />
+          <MetricCard label="Days Left" value={overview?.plan.daysLeft} loading={isLoading} />
+          <MetricCard label="Post Limit Type" value={overview?.plan.postLimitType} loading={isLoading} />
+          <MetricCard label="Post Quota" value={overview?.plan.postQuota} loading={isLoading} />
+          <MetricCard label="Visual Quota" value={overview?.plan.visualQuota ?? "Unlimited"} loading={isLoading} />
+          <MetricCard label="Platform Limit" value={overview?.plan.platformLimit} loading={isLoading} />
+          <MetricCard label="Period Start" value={overview?.usage.periodStart ? new Date(overview.usage.periodStart).toLocaleDateString() : ""} loading={isLoading} />
+          <MetricCard label="Period End" value={overview?.usage.periodEnd ? new Date(overview.usage.periodEnd).toLocaleDateString() : ""} loading={isLoading} />
         </div>
       </Section>
 
-      {/* Usage */}
-      <Section title="Usage">
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-          <MetricCard
-            label="Posts Used"
-            value={overview?.usage.postsUsed}
-            loading={isLoading}
-          />
-          <MetricCard
-            label="Posts Remaining"
-            value={overview?.usage.postsRemaining}
-            loading={isLoading}
-          />
-          <MetricCard
-            label="Platforms Remaining"
-            value={overview?.usage.platformsRemaining}
-            loading={isLoading}
-          />
+      {/* Usage Details */}
+      <Section title="Usage Metrics">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Posts Used" value={overview?.usage.postsUsed} loading={isLoading} />
+          <MetricCard label="Posts Remaining" value={overview?.usage.postsRemaining} loading={isLoading} />
+          <MetricCard label="Visuals Used" value={overview?.usage.visualsUsed} loading={isLoading} />
+          <MetricCard label="Visuals Remaining" value={overview?.usage.visualsRemaining ?? "Unlimited"} loading={isLoading} />
+          <MetricCard label="Visuals Bonus" value={overview?.usage.visualsBonus} loading={isLoading} />
+          <MetricCard label="Platforms Used" value={overview?.usage.platformsUsed} loading={isLoading} />
+          <MetricCard label="Platforms Remaining" value={overview?.usage.platformsRemaining} loading={isLoading} />
+        </div>
+      </Section>
+
+      {/* Social Accounts */}
+      <Section title="Social Accounts">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Connected Total" value={overview?.socialAccounts.connectedTotal} loading={isLoading} />
+          <MetricCard label="Expiring Soon" value={overview?.socialAccounts.expiringSoon} loading={isLoading} />
+          {overview?.socialAccounts.byPlatform && Object.entries(overview.socialAccounts.byPlatform).map(([platform, count]) => (
+            <MetricCard key={platform} label={`${platform}`} value={count} loading={isLoading} />
+          ))}
         </div>
       </Section>
 
