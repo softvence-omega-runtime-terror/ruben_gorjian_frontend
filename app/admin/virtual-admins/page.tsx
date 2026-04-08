@@ -59,6 +59,7 @@ import {
   Search,
   Filter,
   Eye,
+  ChevronDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -456,15 +457,19 @@ export default function AdminManagementPage() {
         </div>
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-slate-500 hidden sm:block" />
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-12 w-40 bg-slate-900 border-slate-800 text-white rounded-xl px-3 outline-none focus:ring-1 focus:ring-lime-400"
-          >
-            <option value="ALL">All Status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="BLOCKED">Blocked</option>
-          </select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-12 w-40 justify-between bg-slate-900 border-slate-800 text-white rounded-xl px-3 hover:bg-slate-800 focus:ring-1 focus:ring-lime-400 transition-colors">
+                {statusFilter === "ALL" ? "All Status" : statusFilter === "ACTIVE" ? "Active" : "Blocked"} 
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+              <DropdownMenuItem onClick={() => setStatusFilter("ALL")}>All Status</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("ACTIVE")}>Active</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("BLOCKED")}>Blocked</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
