@@ -1,23 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
-const BACKEND_URL =
-  process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  "http://localhost:4000";
+import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+    const headers = await getBackendHeaders();
 
-    const res = await fetch(`${BACKEND_URL}/scheduler/sessions`, {
+    const res = await fetch(`${getBackendUrl()}/scheduler/sessions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Cookie: `token=${token}` } : {}),
-      },
+      headers,
       body: JSON.stringify(body),
     });
 
