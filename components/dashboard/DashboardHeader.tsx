@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
+import { NAV_SECTIONS } from "./DashboardSidebar";
 import { cn } from "@/lib/utils";
 import {
   Menu,
@@ -34,7 +35,19 @@ export function DashboardHeader({
   isCollapsed,
 }: DashboardHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { session, refresh } = useSessionContext();
+
+  // Derive the current page title from the sidebar nav
+  const currentPageTitle = (() => {
+    for (const section of NAV_SECTIONS) {
+      const match = section.items.find(item =>
+        item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href)
+      );
+      if (match) return match.label;
+    }
+    return "Dashboard";
+  })();
 
   const handleLogout = async () => {
     try {
@@ -72,7 +85,7 @@ export function DashboardHeader({
         <Menu className="h-5 w-5" />
       </button>
 
-      {/* Desktop: Logo (visible when sidebar collapsed) */}
+      {/* Desktop: Logo — commented out to match admin header design
       <div
         className={cn(
           "hidden lg:flex items-center gap-2 transition-opacity duration-300",
@@ -84,11 +97,12 @@ export function DashboardHeader({
         </div>
         <span className="text-sm font-semibold text-white">Talexia</span>
       </div>
+      */}
 
-      {/* Center: Page Title or Search (flexible) */}
-      <div className="flex-1 flex items-center">
-        <h1 className="text-lg font-semibold text-white hidden md:block">
-          {/* Page title could be dynamic based on route */}
+      {/* Center: Dynamic Page Title */}
+      <div className="flex-1 flex items-center px-4">
+        <h1 className="text-base font-semibold text-white tracking-tight">
+          {currentPageTitle}
         </h1>
       </div>
 
@@ -105,15 +119,15 @@ export function DashboardHeader({
           <span className="lg:hidden">New</span>
         </Button> */}
 
-        {/* Notifications */}
+        {/* Notifications — commented out
         <button
           className="relative rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" />
-          {/* Notification badge */}
           <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-lime-400"></span>
         </button>
+        */}
 
         {/* Profile Dropdown */}
         <DropdownMenu>

@@ -984,7 +984,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, User, UserCheck, UserX, Trash2, ChevronDown } from "lucide-react";
+import { Eye, User, UserCheck, UserX, Trash2, ChevronDown, Clock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -1312,21 +1312,31 @@ export default function AdminUsersPage() {
         header: "Subscription Status",
         cell: ({ row }) => {
           const sub = row.original.subscriptions[0];
-          return sub ? (
+          if (!sub) return <span className="text-xs text-slate-400">—</span>;
+
+          const s = sub.status.toUpperCase();
+          if (s === "ACTIVE" && sub.cancelAtPeriodEnd) {
+            return (
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 font-black px-2 py-0.5 flex items-center gap-1 animate-pulse uppercase text-[10px] tracking-widest">
+                <Clock className="h-2.5 w-2.5" />
+                Scheduled Cancel
+              </Badge>
+            );
+          }
+
+          return (
             <Badge
               variant={
-                sub.status === "ACTIVE"
+                s === "ACTIVE"
                   ? "default"
-                  : sub.status === "PAST_DUE" || sub.status === "CANCELED"
+                  : s === "PAST_DUE" || s === "CANCELED"
                     ? "destructive"
                     : "secondary"
               }
-              className="text-xs"
+              className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5"
             >
-              {sub.status}
+              {s}
             </Badge>
-          ) : (
-            <span className="text-xs text-slate-400">—</span>
           );
         },
       },

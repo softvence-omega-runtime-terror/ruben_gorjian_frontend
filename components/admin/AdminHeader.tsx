@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
+import { NAV_SECTIONS } from "./AdminSidebar";
 import { cn } from "@/lib/utils";
 import {
   Menu,
-  Search,
   Bell,
   ExternalLink,
   LogOut,
@@ -30,8 +30,20 @@ type AdminHeaderProps = {
 
 export function AdminHeader({ onMenuClick, isCollapsed }: AdminHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { session, refresh } = useSessionContext();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Derive the current page title from the sidebar nav
+  const currentPageTitle = (() => {
+    for (const section of NAV_SECTIONS) {
+      const match = section.items.find(item =>
+        item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href)
+      );
+      if (match) return match.label;
+    }
+    return "Dashboard";
+  })();
 
   const handleLogout = async () => {
     try {
@@ -50,7 +62,7 @@ export function AdminHeader({ onMenuClick, isCollapsed }: AdminHeaderProps) {
   };
 
   const handleViewSite = () => {
-    router.push("/dashboard");
+    router.push("/");
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -76,7 +88,7 @@ export function AdminHeader({ onMenuClick, isCollapsed }: AdminHeaderProps) {
       </button>
 
       {/* Desktop: Logo + Admin Badge (visible when sidebar collapsed) */}
-      <div className={cn(
+      {/* <div className={cn(
         "hidden lg:flex items-center gap-2 transition-opacity duration-300",
         isCollapsed ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
       )}>
@@ -87,9 +99,16 @@ export function AdminHeader({ onMenuClick, isCollapsed }: AdminHeaderProps) {
           <span className="text-sm font-semibold text-white">Talexia</span>
           <Badge variant="secondary" className="text-xs">Admin</Badge>
         </div>
+      </div> */}
+
+      {/* Center: Dynamic Page Title */}
+      <div className="flex-1 flex items-center px-4">
+        <h1 className="text-base font-semibold text-white tracking-tight">
+          {currentPageTitle}
+        </h1>
       </div>
 
-      {/* Center: Search Bar */}
+      {/* Search Bar — commented out
       <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:block">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -102,18 +121,18 @@ export function AdminHeader({ onMenuClick, isCollapsed }: AdminHeaderProps) {
           />
         </div>
       </form>
+      */}
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Notifications (placeholder) */}
-        <button
+        {/* <button
           className="hidden sm:flex relative rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" />
-          {/* Notification badge */}
           <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-lime-400"></span>
-        </button>
+        </button> */}
 
         {/* View Site Button */}
         <button
