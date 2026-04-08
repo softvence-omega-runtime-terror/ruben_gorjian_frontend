@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
-const BACKEND_URL =
-  process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  "http://localhost:4000";
+import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
 
 export async function DELETE(
   request: NextRequest,
@@ -16,17 +11,19 @@ export async function DELETE(
 =======
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+<<<<<<< HEAD
 >>>>>>> bfa5281 (fix the buidl error)
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
+=======
+    const { id } = await params;
+    const headers = await getBackendHeaders();
+>>>>>>> 69b6e88 (fix the build error)
 
-    const res = await fetch(`${BACKEND_URL}/uploads/assets/${id}`, {
+    const res = await fetch(`${getBackendUrl()}/uploads/assets/${id}`, {
       method: "DELETE",
-      headers: {
-        ...(token ? { Cookie: `token=${token}` } : {}),
-      },
+      headers,
     });
 
     if (!res.ok) {
@@ -40,10 +37,14 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error: any) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.error(`Asset ${params.id} DELETE Error:`, error);
 =======
     console.error(`Asset ${id} DELETE Error:`, error);
 >>>>>>> bfa5281 (fix the buidl error)
+=======
+    console.error("Asset DELETE Error:", error);
+>>>>>>> 69b6e88 (fix the build error)
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
