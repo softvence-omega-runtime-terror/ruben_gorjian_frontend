@@ -173,6 +173,22 @@ export default function AdminSubmissionsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  
+  // Status Update Dialog State
+  const [statusConfirm, setStatusConfirm] = useState<{
+    open: boolean;
+    submissionId: string;
+    targetStatus: SubmissionStatus;
+    note: string;
+    isBatch?: boolean;
+  }>({
+    open: false,
+    submissionId: "",
+    targetStatus: "SUBMITTED",
+    note: "",
+    isBatch: false,
+  });
 
   const loadSubmissions = useCallback(async () => {
     setLoading(true);
@@ -194,8 +210,17 @@ export default function AdminSubmissionsPage() {
       const queryString = new URLSearchParams(params).toString();
       const url = `/api/admin/submissions${queryString ? `?${queryString}` : ""}`;
 
-      const res = await apiGet<{ submissions: Submission[]; total: number }>(url);
-      setSubmissions(res.submissions);
+      const res = await apiGet<any>(url);
+      
+      // Handle both array response and object response
+      if (Array.isArray(res)) {
+        setSubmissions(res);
+      } else if (res && typeof res === "object" && Array.isArray(res.submissions)) {
+        setSubmissions(res.submissions);
+      } else {
+        console.error("Unexpected response format:", res);
+        setSubmissions([]);
+      }
     } catch (err: unknown) {
       const error = err as { message?: string };
       setError(error.message || "Failed to load submissions");
@@ -209,14 +234,33 @@ export default function AdminSubmissionsPage() {
   }, [loadSubmissions]); // Reload when filters change
 
   async function viewDetails(submissionId: string) {
+    setDetailsLoading(true);
+    setDetailsOpen(true); // Open immediately to show loading
+    setSelectedSubmission(null); // Clear previous
     try {
-      const res = await apiGet<{ submission: DetailedSubmission }>(
+      const res = await apiGet<any>(
         `/api/admin/submissions/${submissionId}`
       );
-      setSelectedSubmission(res.submission);
-      setDetailsOpen(true);
+      
+      console.log("Submission details response:", res);
+
+      // Handle both object response and wrapped response
+      if (res && typeof res === "object") {
+        if (res.submission) {
+          setSelectedSubmission(res.submission);
+        } else {
+          setSelectedSubmission(res as DetailedSubmission);
+        }
+      } else {
+        console.error("Unexpected response format for submission details:", res);
+        setError("Failed to load submission details: Invalid response format");
+        setDetailsOpen(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load submission details");
+      setDetailsOpen(false);
+    } finally {
+      setDetailsLoading(false);
     }
   }
 
@@ -233,10 +277,17 @@ export default function AdminSubmissionsPage() {
 
       // Update selected submission if open
       if (selectedSubmission?.id === submissionId) {
-        const res = await apiGet<{ submission: DetailedSubmission }>(
+        const res = await apiGet<any>(
           `/api/admin/submissions/${submissionId}`
         );
-        setSelectedSubmission(res.submission);
+        
+        if (res && typeof res === "object") {
+          if (res.submission) {
+            setSelectedSubmission(res.submission);
+          } else {
+            setSelectedSubmission(res as DetailedSubmission);
+          }
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update submission");
@@ -248,10 +299,17 @@ export default function AdminSubmissionsPage() {
   async function refreshSubmissionDetails(submissionId: string) {
     await loadSubmissions();
     if (selectedSubmission?.id === submissionId) {
-      const res = await apiGet<{ submission: DetailedSubmission }>(
+      const res = await apiGet<any>(
         `/api/admin/submissions/${submissionId}`
       );
-      setSelectedSubmission(res.submission);
+      
+      if (res && typeof res === "object") {
+        if (res.submission) {
+          setSelectedSubmission(res.submission);
+        } else {
+          setSelectedSubmission(res as DetailedSubmission);
+        }
+      }
     }
   }
 
@@ -271,13 +329,13 @@ export default function AdminSubmissionsPage() {
     }
   }
 
-  async function handleBatchUpdate(status: SubmissionStatus) {
+  async function handleBatchUpdate(status: SubmissionStatus, note?: string) {
     if (selectedIds.size === 0) return;
     
     setUpdating(true);
     try {
       const promises = Array.from(selectedIds).map(id =>
-        apiPatch(`/api/admin/submissions/${id}`, { status })
+        apiPatch(`/api/admin/submissions/${id}`, { status, adminNote: note })
       );
       
       await Promise.all(promises);
@@ -424,7 +482,13 @@ export default function AdminSubmissionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleBatchUpdate("IN_REVIEW")}
+                  onClick={() => setStatusConfirm({
+                    open: true,
+                    submissionId: "batch",
+                    targetStatus: "IN_REVIEW",
+                    note: "",
+                    isBatch: true,
+                  })}
                   disabled={updating}
                 >
                   Mark as In Review
@@ -432,7 +496,13 @@ export default function AdminSubmissionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleBatchUpdate("COMPLETED")}
+                  onClick={() => setStatusConfirm({
+                    open: true,
+                    submissionId: "batch",
+                    targetStatus: "COMPLETED",
+                    note: "",
+                    isBatch: true,
+                  })}
                   disabled={updating}
                 >
                   Mark as Completed
@@ -440,7 +510,13 @@ export default function AdminSubmissionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleBatchUpdate("REJECTED")}
+                  onClick={() => setStatusConfirm({
+                    open: true,
+                    submissionId: "batch",
+                    targetStatus: "REJECTED",
+                    note: "",
+                    isBatch: true,
+                  })}
                   disabled={updating}
                 >
                   Mark as Rejected
@@ -548,6 +624,14 @@ export default function AdminSubmissionsPage() {
                   </div>
                 )}
 
+                {/* Admin Note */}
+                {submission.adminNote && (
+                  <div className="rounded-lg bg-lime-400/5 p-3 border border-lime-400/10">
+                    <p className="text-xs font-bold text-lime-400 uppercase tracking-wider mb-1">Admin Note:</p>
+                    <p className="text-sm text-slate-300">{submission.adminNote}</p>
+                  </div>
+                )}
+
                 {/* Files Summary */}
                 <div className="flex items-center gap-2 text-sm text-slate-400">
                   <FileText className="h-4 w-4" />
@@ -560,7 +644,12 @@ export default function AdminSubmissionsPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => updateStatus(submission.id, "IN_REVIEW")}
+                      onClick={() => setStatusConfirm({
+                        open: true,
+                        submissionId: submission.id,
+                        targetStatus: "IN_REVIEW",
+                        note: "",
+                      })}
                       disabled={updating}
                     >
                       Start Review
@@ -571,7 +660,12 @@ export default function AdminSubmissionsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => updateStatus(submission.id, "COMPLETED")}
+                        onClick={() => setStatusConfirm({
+                          open: true,
+                          submissionId: submission.id,
+                          targetStatus: "COMPLETED",
+                          note: "",
+                        })}
                         disabled={updating}
                       >
                         Mark Complete
@@ -579,7 +673,12 @@ export default function AdminSubmissionsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => updateStatus(submission.id, "REJECTED")}
+                        onClick={() => setStatusConfirm({
+                          open: true,
+                          submissionId: submission.id,
+                          targetStatus: "REJECTED",
+                          note: "",
+                        })}
                         disabled={updating}
                         className="border-red-600 text-red-400 hover:bg-red-600/10"
                       >
@@ -595,30 +694,94 @@ export default function AdminSubmissionsPage() {
         </>
       )}
 
+      {/* Status Update Confirmation Dialog */}
+      <Dialog 
+        open={statusConfirm.open} 
+        onOpenChange={(open) => setStatusConfirm(prev => ({ ...prev, open }))}
+      >
+        <DialogContent className="max-w-md bg-slate-950 border-slate-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              {statusConfirm.isBatch ? "Confirm Batch Status Update" : "Confirm Status Update"}
+            </DialogTitle>
+            <DialogDescription>
+              Update {statusConfirm.isBatch ? `${selectedIds.size} submission${selectedIds.size !== 1 ? 's' : ''}` : 'submission status'} to <span className="text-lime-400 font-bold">{statusConfirm.targetStatus.replace('_', ' ')}</span>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="confirm-note" className="text-slate-400 text-xs uppercase tracking-widest font-bold">
+                Admin Note (Optional)
+              </Label>
+              <Textarea
+                id="confirm-note"
+                placeholder="Add a note for this status change..."
+                value={statusConfirm.note}
+                onChange={(e) => setStatusConfirm(prev => ({ ...prev, note: e.target.value }))}
+                className="bg-slate-900 border-slate-800 focus:ring-lime-400 min-h-[100px]"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="ghost" 
+              onClick={() => setStatusConfirm(prev => ({ ...prev, open: false }))}
+              disabled={updating}
+              className="text-slate-400 hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="bg-lime-400 hover:bg-lime-500 text-slate-950 font-bold px-6"
+              onClick={async () => {
+                if (statusConfirm.isBatch) {
+                  await handleBatchUpdate(statusConfirm.targetStatus, statusConfirm.note);
+                } else {
+                  await updateStatus(statusConfirm.submissionId, statusConfirm.targetStatus, statusConfirm.note);
+                }
+                setStatusConfirm(prev => ({ ...prev, open: false }));
+              }}
+              disabled={updating}
+            >
+              {updating ? "Updating..." : "Confirm Update"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Details Dialog */}
-      {selectedSubmission && (
-        <SubmissionDetailsDialog
-          submission={selectedSubmission}
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
-          onUpdate={updateStatus}
-          onEnhancedSent={refreshSubmissionDetails}
-          onDownload={downloadFile}
-          updating={updating}
-        />
-      )}
+      <SubmissionDetailsDialog
+        submission={selectedSubmission}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        onUpdate={updateStatus}
+        onEnhancedSent={refreshSubmissionDetails}
+        onDownload={downloadFile}
+        setStatusConfirm={setStatusConfirm}
+        updating={updating}
+        loading={detailsLoading}
+      />
     </div>
   );
 }
 
 interface SubmissionDetailsDialogProps {
-  submission: DetailedSubmission;
+  submission: DetailedSubmission | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: (submissionId: string, status: SubmissionStatus, adminNote?: string) => Promise<void>;
   onEnhancedSent: (submissionId: string) => Promise<void>;
   onDownload: (submissionId: string, fileId: string) => Promise<void>;
+  setStatusConfirm: (config: {
+    open: boolean;
+    submissionId: string;
+    targetStatus: SubmissionStatus;
+    note: string;
+  }) => void;
   updating: boolean;
+  loading?: boolean;
 }
 
 function SubmissionDetailsDialog({
@@ -628,158 +791,280 @@ function SubmissionDetailsDialog({
   onUpdate,
   onEnhancedSent,
   onDownload,
+  setStatusConfirm,
   updating,
+  loading,
 }: SubmissionDetailsDialogProps) {
-  const [newStatus, setNewStatus] = useState<SubmissionStatus>(submission.status);
-  const [adminNote, setAdminNote] = useState(submission.adminNote || "");
+  const [newStatus, setNewStatus] = useState<SubmissionStatus>("SUBMITTED");
+  const [adminNote, setAdminNote] = useState("");
   const [enhancedOpen, setEnhancedOpen] = useState(false);
 
+  useEffect(() => {
+    if (submission) {
+      setNewStatus(submission.status);
+      setAdminNote(submission.adminNote || "");
+    }
+  }, [submission]);
+
   const handleUpdate = async () => {
+    if (!submission) return;
     await onUpdate(submission.id, newStatus, adminNote.trim() || undefined);
   };
 
   return (
     <div className="h-screen w-screen">
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Submission Details #{submission.id.slice(0, 8)}</DialogTitle>
-            <DialogDescription>
-              From: {submission.user.email}
-            </DialogDescription>
-            <DialogDescription>
-              Submitted on {formatDate(submission.createdAt)}
-            </DialogDescription>
-            <DialogDescription>
-              Plan: {submission.planCategory === "VISUAL_ONLY" ? "Visual Only" : "Full Management"}
-            </DialogDescription>
-            {(submission.quotaUnitsReserved !== undefined || submission.quotaUnitsConsumed !== undefined) && (
-              <DialogDescription>
-                Quota: {submission.quotaUnitsConsumed ?? 0} consumed • {submission.quotaUnitsReserved ?? 0} reserved
-              </DialogDescription>
-            )}
-          </DialogHeader>
-
-        <div className="space-y-6 mt-4">
-          {/* Current Status */}
-          <div>
-            <Label>Current Status</Label>
-            <div className="mt-2">{getStatusBadge(submission.status)}</div>
-          </div>
-           <Button className="absolute top-0 right-4" variant="outline" onClick={() => onOpenChange(false)} disabled={updating}>
-             <span className="sr-only">Close</span>
-             <XIcon className="h-4 w-4" />
-            </Button>
-            
-            
-            
-
-          {/* User Note */}
-          {submission.userNote && (
-            <div>
-              <Label>User Note</Label>
-              <div className="mt-2 rounded-lg bg-slate-800/50 p-3">
-                <p className="text-sm text-slate-300">{submission.userNote}</p>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-lime-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="!absolute !-m-px !important !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
               </div>
+              <p className="mt-4 text-slate-400">Fetching submission details...</p>
             </div>
+          ) : !submission ? (
+            <div className="p-12 text-center">
+              <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <p className="text-white">Failed to load submission data.</p>
+            </div>
+          ) : (
+            <>
+              {/* Header with Background Accent */}
+              <div className="relative overflow-hidden bg-slate-900 border-b border-slate-800 p-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-lime-400/5 rounded-full blur-3xl -mr-32 -mt-32" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-lime-400/10 flex items-center justify-center border border-lime-400/20">
+                        <FileText className="h-5 w-5 text-lime-400" />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-xl font-bold text-white">
+                          Submission #{submission.id.slice(0, 8)}
+                        </DialogTitle>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Submitted on {formatDate(submission.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    {getStatusBadge(submission.status)}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div className="bg-slate-950/40 rounded-lg p-3 border border-slate-800/50">
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">User Email</p>
+                      <p className="text-sm text-slate-200 truncate">{submission.user.email}</p>
+                    </div>
+                    <div className="bg-slate-950/40 rounded-lg p-3 border border-slate-800/50">
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Plan Category</p>
+                      <p className="text-sm text-slate-200">
+                        {submission.planCategory === "VISUAL_ONLY" ? "Visual Only" : "Full Management"}
+                      </p>
+                    </div>
+                    <div className="bg-slate-950/40 rounded-lg p-3 border border-slate-800/50">
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Files Uploaded</p>
+                      <p className="text-sm text-slate-200">{submission.files.length} Files</p>
+                    </div>
+                    {(submission.quotaUnitsReserved !== undefined || submission.quotaUnitsConsumed !== undefined) && (
+                      <div className="bg-slate-950/40 rounded-lg p-3 border border-slate-800/50">
+                        <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Quota Used</p>
+                        <p className="text-sm text-slate-200">
+                          {submission.quotaUnitsConsumed ?? 0} / {submission.quotaUnitsReserved ?? 0}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Content & Files */}
+                <div className="lg:col-span-2 space-y-8">
+                  {/* User Message */}
+                  <section>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-1 w-4 bg-lime-400 rounded-full" />
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">User Note</h3>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-800/60 leading-relaxed text-slate-300">
+                      {submission.userNote || (
+                        <span className="text-slate-500 italic text-sm">No note provided by user.</span>
+                      )}
+                    </div>
+                  </section>
+
+                  {/* Admin Note Display */}
+                  {submission.adminNote && (
+                    <section>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="h-1 w-4 bg-lime-400 rounded-full" />
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Internal Admin Note</h3>
+                      </div>
+                      <div className="bg-lime-400/5 rounded-xl p-4 border border-lime-400/20 leading-relaxed text-slate-300">
+                        {submission.adminNote}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* Files List */}
+                  <section>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1 w-4 bg-lime-400 rounded-full" />
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Attached Files</h3>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {submission.files.map((file) => (
+                        <div
+                          key={file.id}
+                          className="group flex items-center gap-3 rounded-xl bg-slate-900/40 p-3 border border-slate-800/50 hover:border-lime-400/30 hover:bg-slate-900/80 transition-all duration-200"
+                        >
+                          <div className="h-10 w-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-lime-400 transition-colors">
+                            {getFileIcon(file.fileType)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-200 truncate">{file.fileName}</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{formatFileSize(file.fileSize)}</p>
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => onDownload(submission.id, file.id)}
+                            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* History Timeline */}
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="h-1 w-4 bg-lime-400 rounded-full" />
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Activity History</h3>
+                    </div>
+                    <div className="relative pl-4 border-l border-slate-800 space-y-6 py-2">
+                      {submission.events?.map((event, idx) => (
+                        <div key={event.id} className="relative">
+                          {/* Dot */}
+                          <div className={cn(
+                            "absolute -left-[21px] top-1.5 h-3 w-3 rounded-full border-2 border-slate-950 shadow-sm",
+                            idx === 0 ? "bg-lime-400" : "bg-slate-700"
+                          )} />
+                          
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-white uppercase">{event.status.replace('_', ' ')}</span>
+                              <span className="text-[10px] text-slate-500">•</span>
+                              <span className="text-[10px] text-slate-500">{formatDate(event.createdAt)}</span>
+                            </div>
+                            {event.note && (
+                              <p className="text-sm text-slate-400 mt-1 bg-slate-900/30 rounded-lg p-2 border border-slate-800/40">
+                                {event.note}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+
+                {/* Right Column: Actions */}
+                <div className="space-y-6">
+                  <div className="bg-slate-900/50 rounded-2xl border border-slate-800/80 p-5 space-y-6 sticky top-0">
+                    <div>
+                      <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-4">Management</h3>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="new-status" className="text-slate-500 text-[10px] uppercase tracking-wider font-bold">Target Status</Label>
+                          <select
+                            id="new-status"
+                            value={newStatus}
+                            onChange={(e) => {
+                              const selectedStatus = e.target.value as SubmissionStatus;
+                              setNewStatus(selectedStatus);
+                              if (submission) {
+                                setStatusConfirm({
+                                  open: true,
+                                  submissionId: submission.id,
+                                  targetStatus: selectedStatus,
+                                  note: adminNote,
+                                });
+                              }
+                            }}
+                            className="flex h-11 w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm text-white ring-offset-slate-950 focus:outline-none focus:ring-2 focus:ring-lime-400 transition-all mt-1.5"
+                          >
+                            <option value="DRAFT">Draft</option>
+                            <option value="SUBMITTED">Submitted</option>
+                            <option value="IN_REVIEW">In Review</option>
+                            <option value="ENHANCED_SENT">Enhanced Sent</option>
+                            <option value="NEEDS_CHANGES">Needs Changes</option>
+                            <option value="CLOSED">Closed</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="REJECTED">Rejected</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="admin-note" className="text-slate-500 text-[10px] uppercase tracking-wider font-bold">Admin Feedback</Label>
+                          <Textarea
+                            id="admin-note"
+                            placeholder="Add notes for the user or internal team..."
+                            value={adminNote}
+                            onChange={(e) => setAdminNote(e.target.value)}
+                            className="mt-1.5 bg-slate-950 border-slate-800 rounded-xl min-h-[100px] resize-none focus:ring-lime-400"
+                          />
+                        </div>
+
+                        <Button 
+                          className="w-full h-11 bg-lime-400 hover:bg-lime-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-lime-400/10"
+                          onClick={() => {
+                            if (submission) {
+                              setStatusConfirm({
+                                open: true,
+                                submissionId: submission.id,
+                                targetStatus: newStatus,
+                                note: adminNote,
+                              });
+                            }
+                          }} 
+                          disabled={updating}
+                        >
+                          {updating ? "Processing..." : "Update Status"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-800">
+                      <Button 
+                        variant="outline" 
+                        className="w-full h-11 border-slate-700 hover:bg-slate-800 text-slate-300 rounded-xl"
+                        onClick={() => setEnhancedOpen(true)} 
+                        disabled={updating}
+                      >
+                        Send Enhanced Version
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-
-          {/* Files */}
-          <div>
-            <Label>Files ({submission.files.length})</Label>
-            <div className="mt-2 space-y-2">
-              {submission.files.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center gap-3 rounded-lg bg-slate-800/30 p-3"
-                >
-                  <div className="text-slate-400">{getFileIcon(file.fileType)}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{file.fileName}</p>
-                    <p className="text-xs text-slate-400">{formatFileSize(file.fileSize)}</p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onDownload(submission.id, file.id)}
-                    className="gap-2"
-                  >
-                    <Download className="h-3 w-3" />
-                    Download
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Update Status */}
-          <div>
-            <Label htmlFor="new-status">Update Status</Label>
-            <select
-              id="new-status"
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value as SubmissionStatus)}
-              className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white ring-offset-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 focus-visible:ring-offset-2 mt-2"
-            >
-              <option value="DRAFT">Draft</option>
-              <option value="SUBMITTED">Submitted</option>
-              <option value="IN_REVIEW">In Review</option>
-              <option value="ENHANCED_SENT">Enhanced Sent</option>
-              <option value="NEEDS_CHANGES">Needs Changes</option>
-              <option value="CLOSED">Closed</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="REJECTED">Rejected</option>
-            </select>
-          </div>
-
-          {/* Admin Note */}
-          <div>
-            <Label htmlFor="admin-note">Admin Note</Label>
-            <Textarea
-              id="admin-note"
-              placeholder="Add notes or feedback for the user..."
-              value={adminNote}
-              onChange={(e) => setAdminNote(e.target.value)}
-              className="mt-2"
-              rows={3}
-            />
-          </div>
-
-          {/* Event History */}
-          <div>
-            <Label>Event History</Label>
-            <div className="mt-2 space-y-2">
-              {submission.events.map((event) => (
-                <div key={event.id} className="rounded-lg bg-slate-800/30 p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    {getStatusBadge(event.status)}
-                    <p className="text-xs text-slate-400">{formatDate(event.createdAt)}</p>
-                  </div>
-                  {event.note && <p className="text-sm text-slate-300 mt-2">{event.note}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-slate-800">
-            <Button variant="outline" onClick={() => setEnhancedOpen(true)} disabled={updating}>
-              Send Enhanced Version
-            </Button>
-            
-            <Button onClick={handleUpdate} disabled={updating}>
-              {updating ? "Updating..." : "Update Submission"}
-            </Button>
-          </div>
-        </div>
         </DialogContent>
       </Dialog>
-      <EnhancedDeliveryComposer
-        submissionId={submission.id}
-        open={enhancedOpen}
-        onOpenChange={setEnhancedOpen}
-        onSent={() => onEnhancedSent(submission.id)}
-      />
+      {submission && (
+        <EnhancedDeliveryComposer
+          submissionId={submission.id}
+          open={enhancedOpen}
+          onOpenChange={setEnhancedOpen}
+          onSent={() => onEnhancedSent(submission.id)}
+        />
+      )}
     </div>
   );
 }

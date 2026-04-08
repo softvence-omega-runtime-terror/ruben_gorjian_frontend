@@ -128,7 +128,11 @@ export function AdminSidebar({
   const router = useRouter();
   const { session } = useSessionContext();
 
+<<<<<<< HEAD
   const userPermissions = session?.permissions || [];
+=======
+  const userPermissions: string[] = session?.permissions ?? [];
+>>>>>>> 7ff57f1 (api set the submission)
   const isSuperAdmin = session?.role === "SUPER_ADMIN";
 
   const hasPermission = (permission?: string) => {

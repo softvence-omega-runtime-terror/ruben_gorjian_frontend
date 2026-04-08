@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useMemo,
   useCallback,
   useContext,
   useEffect,
@@ -86,8 +87,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     refresh();
   }, [refresh]);
 
+  const value = useMemo(
+    () => ({ session, loading, error, refresh }),
+    [session, loading, error, refresh]
+  );
+
   return (
-    <SessionContext.Provider value={{ session, loading, error, refresh }}>
+    <SessionContext.Provider value={value}>
       {children}
     </SessionContext.Provider>
   );

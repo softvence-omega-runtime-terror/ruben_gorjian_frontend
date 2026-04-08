@@ -35,7 +35,49 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     if (!isAdmin && !isOnLoginPage) {
       router.replace("/admin/login");
     }
+<<<<<<< HEAD
   }, [sessionLoading, isAdmin, isOnLoginPage, router, pathname]);
+=======
+
+    if (isAdmin && !isOnLoginPage) {
+      // Find what permission the current route requires
+      const userPermissions = session?.permissions || [];
+      let requiredPermission: string | undefined;
+
+      for (const section of NAV_SECTIONS) {
+        // Find exact or partial match for active route (e.g., /admin/users or /admin/users/123)
+        const activeItem = section.items.find(item => 
+          item.href !== "/admin" && pathname.startsWith(item.href) || 
+          item.href === "/admin" && pathname === "/admin"
+        );
+        if (activeItem) {
+          requiredPermission = activeItem.permission;
+          break;
+        }
+      }
+
+      // If route requires a permission and user doesn't have it
+      if (requiredPermission && !userPermissions.includes(requiredPermission)) {
+        // Find the first route they DO have access to
+        let firstAccessibleRoute: string | null = null;
+        for (const section of NAV_SECTIONS) {
+          const item = section.items.find(i => !i.permission || userPermissions.includes(i.permission));
+          if (item) {
+            firstAccessibleRoute = item.href;
+            break;
+          }
+        }
+
+        if (firstAccessibleRoute && firstAccessibleRoute !== pathname) {
+          router.replace(firstAccessibleRoute);
+        } else if (!firstAccessibleRoute) {
+          // If they have basically no permissions, force them out
+          router.replace("/admin/login");
+        }
+      }
+    }
+  }, [sessionLoading, isAdmin, isOnLoginPage, router, pathname, session?.permissions]);
+>>>>>>> 7ff57f1 (api set the submission)
 
   // Load sidebar collapsed state from localStorage (run once on mount / hydration)
   useEffect(() => {

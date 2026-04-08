@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { getBackendUrl } from "@/lib/server-backend";
+import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cookieStore = await cookies();
-    const cookieHeader = cookieStore ? cookieStore.toString() : "";
+    const { id } = await params;
 
-    const res = await fetch(`${getBackendUrl()}/admin/submissions/${params.id}`, {
-      headers: {
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
-      },
+    const res = await fetch(`${getBackendUrl()}/api/admin/submissions/${id}`, {
+      headers: await getBackendHeaders(),
       credentials: "include",
     });
     
@@ -27,18 +23,17 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
-    const cookieStore = await cookies();
-    const cookieHeader = cookieStore ? cookieStore.toString() : "";
 
-    const res = await fetch(`${getBackendUrl()}/admin/submissions/${params.id}`, {
+    const res = await fetch(`${getBackendUrl()}/api/admin/submissions/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        ...(await getBackendHeaders()),
       },
       credentials: "include",
       body: JSON.stringify(body),

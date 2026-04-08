@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { getBackendUrl } from "@/lib/server-backend";
+import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string; fileId: string } }
+  { params }: { params: Promise<{ id: string; fileId: string }> }
 ) {
   try {
-    const cookieStore = await cookies();
-    const cookieHeader = cookieStore ? cookieStore.toString() : "";
+    const { id, fileId } = await params;
 
-    const res = await fetch(`${getBackendUrl()}/admin/submissions/${params.id}/files/${params.fileId}/download`, {
-      headers: {
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
-      },
+    const res = await fetch(`${getBackendUrl()}/api/admin/submissions/${id}/files/${fileId}/download`, {
+      headers: await getBackendHeaders(),
       credentials: "include",
     });
     
