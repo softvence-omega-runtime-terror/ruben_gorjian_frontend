@@ -56,7 +56,7 @@ import { SupportStatusModal } from "@/components/admin/support/SupportStatusModa
 
 // --- Types ---
 
-type SubmissionStatus = "PENDING" | "RESOLVED";
+type SubmissionStatus = "PENDING" | "RESOLVED" | "REPLIED";
 
 interface Submission {
   id: string;

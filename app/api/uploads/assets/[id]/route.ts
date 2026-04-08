@@ -8,10 +8,17 @@ const BACKEND_URL =
 
 export async function DELETE(
   request: NextRequest,
+<<<<<<< HEAD
   { params }: { params: { id: string } }
 ) {
   try {
     const { id } = await params;
+=======
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+>>>>>>> bfa5281 (fix the buidl error)
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -32,7 +39,11 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
+<<<<<<< HEAD
     console.error(`Asset ${params.id} DELETE Error:`, error);
+=======
+    console.error(`Asset ${id} DELETE Error:`, error);
+>>>>>>> bfa5281 (fix the buidl error)
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
