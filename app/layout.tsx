@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
 
-      <body
+      <body suppressHydrationWarning 
         className={`${stack_sans_notch.variable} ${poppins.variable} ${sora.variable} ${stack_sans_notch.className} ${poppins.className} min-h-screen antialiased bg-slate-950 px-2 sm:px-0`}
       >
         <Toaster position="top-right" expand={false} richColors />
