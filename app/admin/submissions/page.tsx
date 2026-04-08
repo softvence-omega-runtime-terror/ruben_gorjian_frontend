@@ -25,12 +25,14 @@ import {
   Download,
   Eye,
   Search,
-  XIcon
+  XIcon,
+  Package
 } from "lucide-react";
 import { apiGet, apiPatch } from "@/lib/api-client";
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { EnhancedDeliveryComposer } from "@/components/submissions/enhanced-delivery-composer";
+import { EnhancedDeliveryViewer } from "@/components/submissions/enhanced-delivery-viewer";
 
 type SubmissionStatus = "DRAFT" | "SUBMITTED" | "IN_REVIEW" | "ENHANCED_SENT" | "NEEDS_CHANGES" | "CLOSED" | "COMPLETED" | "REJECTED";
 type SubmissionPlanCategory = "FULL_MANAGEMENT" | "VISUAL_ONLY";
@@ -814,7 +816,7 @@ function SubmissionDetailsDialog({
   return (
     <div className="h-screen w-screen">
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
+        <DialogContent className="!max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 border-slate-800 p-0">
           {loading ? (
             <div className="p-12 text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-lime-400 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
@@ -939,6 +941,23 @@ function SubmissionDetailsDialog({
                       ))}
                     </div>
                   </section>
+
+                  {/* Enhanced Deliveries Section */}
+                  {submission.status === "ENHANCED_SENT" && (
+                    <section>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="h-1 w-4 bg-blue-400 rounded-full" />
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Enhanced Deliveries (Admin View)</h3>
+                      </div>
+                      <div className="bg-blue-600/5 rounded-2xl p-6 border border-blue-600/10">
+                        <EnhancedDeliveryViewer 
+                          submissionId={submission.id} 
+                          triggerLabel="View Sent Deliveries"
+                          isAdmin={true}
+                        />
+                      </div>
+                    </section>
+                  )}
 
                   {/* History Timeline */}
                   <section>

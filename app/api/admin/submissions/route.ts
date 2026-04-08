@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
-import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
+import { cookies } from "next/headers";
+import { getBackendUrl } from "@/lib/server-backend";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const query = searchParams.toString();
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore ? cookieStore.toString() : "";
 
     const res = await fetch(`${getBackendUrl()}/api/admin/submissions${query ? `?${query}` : ""}`, {
-      headers: await getBackendHeaders(),
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+      },
       credentials: "include",
     });
     
