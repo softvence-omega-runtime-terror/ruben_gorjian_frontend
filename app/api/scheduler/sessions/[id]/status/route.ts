@@ -8,25 +8,10 @@ const BACKEND_URL =
 
 export async function PATCH(
   request: NextRequest,
-<<<<<<< HEAD
-<<<<<<< HEAD
   { params }: { params: { id: string } }
-=======
-  { params }: { params: Promise<{ id: string }> }
->>>>>>> xerox
 ) {
-  const { id } = await params;
   try {
-<<<<<<< HEAD
     const { id } = await params;
-=======
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  try {
->>>>>>> bfa5281 (fix the buidl error)
-=======
->>>>>>> xerox
     const body = await request.json().catch(() => ({}));
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
@@ -44,15 +29,7 @@ export async function PATCH(
 
     return NextResponse.json(data, { status: res.status });
   } catch (error: any) {
-<<<<<<< HEAD
-<<<<<<< HEAD
     console.error(`Scheduler Session status ${params.id} PATCH Error:`, error);
-=======
-    console.error(`Scheduler Session status ${id} PATCH Error:`, error);
->>>>>>> bfa5281 (fix the buidl error)
-=======
-    console.error(`Scheduler Session status ${id} PATCH Error:`, error);
->>>>>>> xerox
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
