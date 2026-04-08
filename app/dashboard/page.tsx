@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4d1cd4d (update)
 "use client";
 
 import Link from "next/link";
@@ -16,6 +19,7 @@ type DashboardOverview = {
     planCode: string;
     planCategory: string;
     status: string;
+<<<<<<< HEAD
     billingCycle: string;
     currentPeriodEnd: string;
     daysLeft: number;
@@ -23,10 +27,28 @@ type DashboardOverview = {
     platformLimit: number;
   };
   usage: {
+=======
+    priceType: string;
+    billingCycle: string;
+    currentPeriodEnd: string;
+    daysLeft: number;
+    postLimitType: string;
+    postQuota: number;
+    visualQuota: number | null;
+    platformLimit: number;
+  };
+  usage: {
+    periodStart: string;
+    periodEnd: string;
+>>>>>>> 4d1cd4d (update)
     postsUsed: number;
     postsRemaining: number;
     visualsUsed: number;
     visualsRemaining: number | null;
+<<<<<<< HEAD
+=======
+    visualsBonus: number;
+>>>>>>> 4d1cd4d (update)
     platformsUsed: number;
     platformsRemaining: number;
   };
@@ -52,6 +74,7 @@ type UpcomingPost = {
   targets: { platform: string; status: string }[];
 };
 
+<<<<<<< HEAD
 // ---------------- Mock Data ----------------
 
 const MOCK_RECENT_ACTIVITY: RecentActivity[] = [
@@ -89,6 +112,8 @@ const MOCK_PIPELINE = {
   postedThisWeek: 5,
 };
 
+=======
+>>>>>>> 4d1cd4d (update)
 // ---------------- Hooks ----------------
 
 function useDashboardOverview(enabled: boolean) {
@@ -170,11 +195,18 @@ export default function DashboardPage() {
   const pipeline = pipelineQ.data?.data;
   const alerts = alertsQ.data?.data.items || [];
 
+<<<<<<< HEAD
   const activityData = activity.length > 0 ? activity : MOCK_RECENT_ACTIVITY;
   const upcomingData = upcoming.length > 0 ? upcoming : MOCK_UPCOMING_POSTS;
   const alertsData = alerts.length > 0 ? alerts : MOCK_ALERTS;
   const pipelineData =
     pipeline && Object.keys(pipeline).length > 0 ? pipeline : MOCK_PIPELINE;
+=======
+  const activityData = activity;
+  const upcomingData = upcoming;
+  const alertsData = alerts;
+  const pipelineData = pipeline || {};
+>>>>>>> 4d1cd4d (update)
 
   const isLoading = overviewQ.isLoading;
 
@@ -210,6 +242,7 @@ export default function DashboardPage() {
         </Button>
       </div>
 
+<<<<<<< HEAD
       {/* Plan & Usage */}
       <Section title="Plan & Usage">
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
@@ -254,11 +287,53 @@ export default function DashboardPage() {
             value={overview?.usage.platformsRemaining}
             loading={isLoading}
           />
+=======
+      {/* Plan Details */}
+      <Section title="Plan Details">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Plan Code" value={overview?.plan.planCode} loading={isLoading} />
+          <MetricCard label="Category" value={overview?.plan.planCategory} loading={isLoading} />
+          <MetricCard label="Status" value={overview?.plan.status} loading={isLoading} />
+          <MetricCard label="Price Type" value={overview?.plan.priceType} loading={isLoading} />
+          <MetricCard label="Billing Cycle" value={overview?.plan.billingCycle} loading={isLoading} />
+          <MetricCard label="Days Left" value={overview?.plan.daysLeft} loading={isLoading} />
+          <MetricCard label="Post Limit Type" value={overview?.plan.postLimitType} loading={isLoading} />
+          <MetricCard label="Post Quota" value={overview?.plan.postQuota} loading={isLoading} />
+          <MetricCard label="Visual Quota" value={overview?.plan.visualQuota ?? "Unlimited"} loading={isLoading} />
+          <MetricCard label="Platform Limit" value={overview?.plan.platformLimit} loading={isLoading} />
+          <MetricCard label="Period Start" value={overview?.usage.periodStart ? new Date(overview.usage.periodStart).toLocaleDateString() : ""} loading={isLoading} />
+          <MetricCard label="Period End" value={overview?.usage.periodEnd ? new Date(overview.usage.periodEnd).toLocaleDateString() : ""} loading={isLoading} />
+        </div>
+      </Section>
+
+      {/* Usage Details */}
+      <Section title="Usage Metrics">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Posts Used" value={overview?.usage.postsUsed} loading={isLoading} />
+          <MetricCard label="Posts Remaining" value={overview?.usage.postsRemaining} loading={isLoading} />
+          <MetricCard label="Visuals Used" value={overview?.usage.visualsUsed} loading={isLoading} />
+          <MetricCard label="Visuals Remaining" value={overview?.usage.visualsRemaining ?? "Unlimited"} loading={isLoading} />
+          <MetricCard label="Visuals Bonus" value={overview?.usage.visualsBonus} loading={isLoading} />
+          <MetricCard label="Platforms Used" value={overview?.usage.platformsUsed} loading={isLoading} />
+          <MetricCard label="Platforms Remaining" value={overview?.usage.platformsRemaining} loading={isLoading} />
+        </div>
+      </Section>
+
+      {/* Social Accounts */}
+      <Section title="Social Accounts">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <MetricCard label="Connected Total" value={overview?.socialAccounts.connectedTotal} loading={isLoading} />
+          <MetricCard label="Expiring Soon" value={overview?.socialAccounts.expiringSoon} loading={isLoading} />
+          {overview?.socialAccounts.byPlatform && Object.entries(overview.socialAccounts.byPlatform).map(([platform, count]) => (
+            <MetricCard key={platform} label={`${platform}`} value={count} loading={isLoading} />
+          ))}
+>>>>>>> 4d1cd4d (update)
         </div>
       </Section>
 
       {/* Alerts */}
       <Section title={`System Alerts (${alertsData.length})`}>
+<<<<<<< HEAD
         <div className="space-y-3">
           {alertsData.map((a, i) => (
             <div
@@ -278,10 +353,36 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+=======
+        {alertsData.length === 0 ? (
+          <p className="text-sm text-slate-400">No data available</p>
+        ) : (
+          <div className="space-y-3">
+            {alertsData.map((a, i) => (
+              <div
+                key={i}
+                className="flex items-start justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900 p-3 hover:bg-slate-800/40 transition"
+              >
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 mt-1 text-yellow-400" />
+                  <div>
+                    <p className="text-sm text-slate-200">{a.message}</p>
+                    <span className="text-xs text-slate-500">{a.code}</span>
+                  </div>
+                </div>
+                <span className="text-xs px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                  {a.type}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+>>>>>>> 4d1cd4d (update)
       </Section>
 
       {/* Pipeline */}
       <Section title="Post Pipeline">
+<<<<<<< HEAD
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
           {Object.entries(pipelineData).map(([key, val]) => (
             <div
@@ -295,10 +396,30 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+=======
+        {Object.keys(pipelineData).length === 0 ? (
+          <p className="text-sm text-slate-400">No data available</p>
+        ) : (
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+            {Object.entries(pipelineData).map(([key, val]) => (
+              <div
+                key={key}
+                className="rounded-lg border border-slate-800 bg-slate-900 p-4 text-center hover:border-slate-700 transition"
+              >
+                <p className="text-xs text-slate-400 capitalize">{key}</p>
+                <p className="text-xl font-semibold text-white mt-1">
+                  {val as number}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+>>>>>>> 4d1cd4d (update)
       </Section>
 
       {/* Upcoming */}
       <Section title="Upcoming Posts">
+<<<<<<< HEAD
         <div className="space-y-3">
           {upcomingData.map((p) => (
             <div
@@ -320,10 +441,38 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+=======
+        {upcomingData.length === 0 ? (
+          <p className="text-sm text-slate-400">No data available</p>
+        ) : (
+          <div className="space-y-3">
+            {upcomingData.map((p) => (
+              <div
+                key={p.postId}
+                className="flex flex-col gap-1 rounded-lg border border-slate-800 bg-slate-900 p-4 hover:bg-slate-800/40 transition"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-white">{p.postId}</p>
+                  <span className="text-xs px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    {p.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Scheduled: {new Date(p.scheduledFor).toLocaleString()}
+                </p>
+                <p className="text-xs text-slate-500">
+                  Platforms: {p.targets.map((t) => t.platform).join(", ")}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+>>>>>>> 4d1cd4d (update)
       </Section>
 
       {/* Recent Activity */}
       <Section title="Recent Activity">
+<<<<<<< HEAD
         <div className="space-y-3">
           {activityData.map((a) => (
             <div
@@ -341,6 +490,29 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
+=======
+        {activityData.length === 0 ? (
+          <p className="text-sm text-slate-400">No data available</p>
+        ) : (
+          <div className="space-y-3">
+            {activityData.map((a) => (
+              <div
+                key={a.id}
+                className="flex gap-3 rounded-lg border border-slate-800 bg-slate-900 p-3 hover:bg-slate-800/40 transition"
+              >
+                <div className="mt-1 h-2 w-2 rounded-full bg-lime-400" />
+                <div>
+                  <p className="text-sm text-white">{a.title}</p>
+                  <p className="text-xs text-slate-400">{a.description}</p>
+                  <p className="text-xs text-slate-500">
+                    {new Date(a.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+>>>>>>> 4d1cd4d (update)
       </Section>
 
       {/* Links */}
@@ -409,6 +581,7 @@ function MetricCard({
     </Card>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -800,3 +973,5 @@ function MetricCard({
   );
 }
 >>>>>>> a150e68 (user dashboard overview mock data removed)
+=======
+>>>>>>> 4d1cd4d (update)
