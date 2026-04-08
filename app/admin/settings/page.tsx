@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -13,6 +16,11 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+<<<<<<< HEAD
+=======
+  Eye,
+  EyeOff,
+>>>>>>> xerox
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -447,6 +455,7 @@ export default function AdminSettingsPage() {
                   <Label className="text-xs font-black uppercase tracking-widest text-slate-500 pl-1">
                     Current Password
                   </Label>
+<<<<<<< HEAD
                   <Input
                     type="password"
                     value={passwordForm["current-password"]}
@@ -459,12 +468,36 @@ export default function AdminSettingsPage() {
                     className="bg-slate-950 border-slate-800 rounded-xl h-11"
                     required
                   />
+=======
+                  <div className="relative">
+                    <Input
+                      type={showPassword.current ? "text" : "password"}
+                      value={passwordForm["current-password"]}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          "current-password": e.target.value,
+                        })
+                      }
+                      className="bg-slate-950 border-slate-800 rounded-xl h-11 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
+                      className="absolute right-3 top-3 text-slate-500 hover:text-white"
+                    >
+                      {showPassword.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+>>>>>>> xerox
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-black uppercase tracking-widest text-slate-500 pl-1">
                       New Password
                     </Label>
+<<<<<<< HEAD
                     <Input
                       type="password"
                       value={passwordForm["new-password"]}
@@ -477,11 +510,35 @@ export default function AdminSettingsPage() {
                       className="bg-slate-950 border-slate-800 rounded-xl h-11"
                       required
                     />
+=======
+                    <div className="relative">
+                      <Input
+                        type={showPassword.new ? "text" : "password"}
+                        value={passwordForm["new-password"]}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            "new-password": e.target.value,
+                          })
+                        }
+                        className="bg-slate-950 border-slate-800 rounded-xl h-11 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
+                        className="absolute right-3 top-3 text-slate-500 hover:text-white"
+                      >
+                        {showPassword.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+>>>>>>> xerox
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-black uppercase tracking-widest text-slate-500 pl-1">
                       Confirm New Password
                     </Label>
+<<<<<<< HEAD
                     <Input
                       type="password"
                       value={passwordForm["confirm-password"]}
@@ -494,6 +551,29 @@ export default function AdminSettingsPage() {
                       className="bg-slate-950 border-slate-800 rounded-xl h-11"
                       required
                     />
+=======
+                    <div className="relative">
+                      <Input
+                        type={showPassword.confirm ? "text" : "password"}
+                        value={passwordForm["confirm-password"]}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            "confirm-password": e.target.value,
+                          })
+                        }
+                        className="bg-slate-950 border-slate-800 rounded-xl h-11 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
+                        className="absolute right-3 top-3 text-slate-500 hover:text-white"
+                      >
+                        {showPassword.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+>>>>>>> xerox
                   </div>
                 </div>
                 <div className="pt-4 flex items-center gap-4 bg-lime-400/5 p-4 rounded-2xl border border-lime-400/10">
@@ -669,6 +749,7 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -1370,3 +1451,5 @@ export default function AdminSettingsPage() {
   );
 }
 >>>>>>> ad0988b (eye buttons added to password fileds)
+=======
+>>>>>>> xerox

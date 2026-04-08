@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import { useMemo, useState } from "react";
@@ -111,8 +114,12 @@ function StatusBadge({ status }: { status: SubmissionStatus }) {
   }
   return (
     <Badge
+<<<<<<< HEAD
       variant="outline"
       className="text-white border-amber-400/50 bg-amber-400/10"
+=======
+      className="bg-orange-500 text-white border-none font-bold px-3 shadow-[0_0_10px_rgba(249,115,22,0.3)]"
+>>>>>>> xerox
     >
       Pending
     </Badge>
@@ -585,6 +592,7 @@ export default function SupportSystemPage() {
     </div>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -1172,3 +1180,5 @@ export default function SupportSystemPage() {
   );
 }
 >>>>>>> d562463 (remove the search filed and set the path)
+=======
+>>>>>>> xerox

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import { useScrollPropagation } from "@/hooks/use-scroll-propagation";
@@ -59,20 +60,25 @@ export function DialogContent({
 }) {
   const ctx = useDialog();
   const scrollHandlers = useScrollPropagation({ scrollWindowAtBoundary: true });
-  if (!ctx.open) return null;
+  const [mounted, setMounted] = React.useState(false);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4">
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!ctx.open || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-4">
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => ctx.setOpen(false)}
         aria-hidden="true"
       />
       <div
         className={cn(
-          "relative z-50 flex max-h-[90vh] w-full max-w-md flex-col rounded-lg border border-slate-800 bg-slate-900 shadow-xl",
-          className,
-          "overflow-hidden"
+          "relative z-[100] flex max-h-[90vh] w-full max-w-md flex-col rounded-2xl border border-slate-700/50 bg-slate-900 shadow-2xl overflow-hidden",
+          className
         )}
       >
         <div
@@ -82,7 +88,8 @@ export function DialogContent({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

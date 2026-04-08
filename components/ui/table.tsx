@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -44,7 +47,11 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
+<<<<<<< HEAD
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+=======
+      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-lime-400/10",
+>>>>>>> xerox
       className
     )}
     {...props}
@@ -87,6 +94,7 @@ export {
   TableRow,
   TableCell,
 }
+<<<<<<< HEAD
 =======
 import * as React from "react"
 
@@ -177,3 +185,5 @@ export {
   TableCell,
 }
 >>>>>>> ce3d2c1 (ui change the user page in admin dashboard)
+=======
+>>>>>>> xerox

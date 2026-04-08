@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
@@ -495,7 +498,11 @@ export default function BillingPage() {
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Billing</p>
                   <p className="text-sm font-semibold text-slate-200 capitalize">
+<<<<<<< HEAD
                     {currentPlanDisplay?.interval}ly
+=======
+                    {currentPlanDisplay?.interval === "year" ? "Yearly" : "Monthly"}
+>>>>>>> xerox
                   </p>
                 </div>
               </div>
@@ -1171,6 +1178,7 @@ function formatCurrency(amount: number, currency: string) {
     return `$${(amount / 100).toFixed(2)}`;
   }
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -2345,3 +2353,5 @@ function formatCurrency(amount: number, currency: string) {
   }
 }
 >>>>>>> d562463 (remove the search filed and set the path)
+=======
+>>>>>>> xerox

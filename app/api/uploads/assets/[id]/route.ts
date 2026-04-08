@@ -4,6 +4,7 @@ import { getBackendUrl, getBackendHeaders } from "@/lib/server-backend";
 export async function DELETE(
   request: NextRequest,
 <<<<<<< HEAD
+<<<<<<< HEAD
   { params }: { params: { id: string } }
 ) {
   try {
@@ -20,6 +21,13 @@ export async function DELETE(
     const { id } = await params;
     const headers = await getBackendHeaders();
 >>>>>>> 69b6e88 (fix the build error)
+=======
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const headers = await getBackendHeaders();
+>>>>>>> xerox
 
     const res = await fetch(`${getBackendUrl()}/uploads/assets/${id}`, {
       method: "DELETE",
@@ -38,6 +46,7 @@ export async function DELETE(
   } catch (error: any) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     console.error(`Asset ${params.id} DELETE Error:`, error);
 =======
     console.error(`Asset ${id} DELETE Error:`, error);
@@ -45,6 +54,9 @@ export async function DELETE(
 =======
     console.error("Asset DELETE Error:", error);
 >>>>>>> 69b6e88 (fix the build error)
+=======
+    console.error("Asset DELETE Error:", error);
+>>>>>>> xerox
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

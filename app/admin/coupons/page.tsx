@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import { useMemo, useState } from "react";
@@ -312,6 +315,10 @@ export default function AdminCouponsPage() {
     },
     {
       id: "actions",
+<<<<<<< HEAD
+=======
+      header: "Actions",
+>>>>>>> xerox
       cell: ({ row }) => {
         const coupon = row.original;
         return (
@@ -659,6 +666,7 @@ export default function AdminCouponsPage() {
     </div>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -1322,3 +1330,5 @@ export default function AdminCouponsPage() {
   );
 }
 >>>>>>> d562463 (remove the search filed and set the path)
+=======
+>>>>>>> xerox

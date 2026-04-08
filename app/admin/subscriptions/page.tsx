@@ -1,8 +1,16 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import { useMemo, useState } from "react";
 import { 
+<<<<<<< HEAD
+=======
+  Clock, 
+  CheckCircle,
+>>>>>>> xerox
   CreditCard, 
   Search, 
   RefreshCw, 
@@ -104,11 +112,17 @@ function StatusBadge({ status, cancelAtPeriodEnd }: { status: string; cancelAtPe
   if (s === "ACTIVE") {
     if (cancelAtPeriodEnd) {
       return (
+<<<<<<< HEAD
         <Badge variant="outline" className="text-amber-400 border-amber-400/50 bg-amber-400/10">
+=======
+        <Badge className="bg-amber-400 text-black border-amber-400 font-black px-3 py-1.5 flex items-center gap-1.5 shadow-[0_0_20px_rgba(251,191,36,0.35)] uppercase text-[11px] tracking-wide whitespace-nowrap">
+          <Clock className="h-4 w-4 flex-shrink-0" />
+>>>>>>> xerox
           Scheduled to Cancel
         </Badge>
       );
     }
+<<<<<<< HEAD
     return <Badge className="bg-lime-500/20 text-lime-400 border-lime-500/20">Active</Badge>;
   }
   if (s === "CANCELED" || s === "CANCELLED") {
@@ -118,6 +132,32 @@ function StatusBadge({ status, cancelAtPeriodEnd }: { status: string; cancelAtPe
     return <Badge variant="secondary" className="bg-slate-500/20 text-slate-400">Incomplete</Badge>;
   }
   return <Badge variant="outline">{status}</Badge>;
+=======
+    return (
+      <Badge className="bg-lime-500/10 text-lime-400 border-lime-500/20 px-3 py-1 flex items-center gap-1.5 uppercase text-[10px] font-black tracking-widest">
+        <CheckCircle className="h-3 w-3" />
+        Active
+      </Badge>
+    );
+  }
+  if (s === "CANCELED" || s === "CANCELLED") {
+    return (
+      <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 px-3 py-1 flex items-center gap-1.5 uppercase text-[10px] font-black tracking-widest">
+        <AlertCircle className="h-3 w-3" />
+        Canceled
+      </Badge>
+    );
+  }
+  if (s === "INCOMPLETE") {
+    return (
+      <Badge variant="secondary" className="bg-slate-500/10 text-slate-400 border-slate-500/20 px-3 py-1 flex items-center gap-1.5 uppercase text-[10px] font-black tracking-widest">
+        <RefreshCw className="h-3 w-3" />
+        Incomplete
+      </Badge>
+    );
+  }
+  return <Badge variant="outline" className="px-3 py-1 uppercase text-[10px] font-black tracking-widest">{status}</Badge>;
+>>>>>>> xerox
 }
 
 function formatDate(dateStr: string | null) {
@@ -241,7 +281,11 @@ export default function AdminSubscriptionsPage() {
       accessorKey: "priceType",
       header: "Type",
       cell: ({ row }) => (
+<<<<<<< HEAD
         <Badge variant={row.original.priceType === "FOUNDER" ? "secondary" : "outline"} className="text-[10px] h-5">
+=======
+        <Badge variant={row.original.priceType === "FOUNDER" ? "secondary" : "outline"} className="text-[10px] h-5 border-slate-700 bg-slate-800/50 text-slate-300">
+>>>>>>> xerox
           {row.original.priceType}
         </Badge>
       ),
@@ -267,12 +311,20 @@ export default function AdminSubscriptionsPage() {
     },
     {
       id: "actions",
+<<<<<<< HEAD
+=======
+      header: "Actions",
+>>>>>>> xerox
       cell: ({ row }) => {
         const sub = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
+<<<<<<< HEAD
               <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-800">
+=======
+              <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800">
+>>>>>>> xerox
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -604,6 +656,7 @@ export default function AdminSubscriptionsPage() {
     </div>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -1230,3 +1283,5 @@ export default function AdminSubscriptionsPage() {
   );
 }
 >>>>>>> d562463 (remove the search filed and set the path)
+=======
+>>>>>>> xerox

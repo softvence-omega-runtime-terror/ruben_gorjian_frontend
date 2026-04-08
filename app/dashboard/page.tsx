@@ -1,7 +1,10 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
 "use client";
 
 import Link from "next/link";
@@ -20,6 +23,7 @@ type DashboardOverview = {
     planCategory: string;
     status: string;
 <<<<<<< HEAD
+<<<<<<< HEAD
     billingCycle: string;
     currentPeriodEnd: string;
     daysLeft: number;
@@ -28,6 +32,8 @@ type DashboardOverview = {
   };
   usage: {
 =======
+=======
+>>>>>>> xerox
     priceType: string;
     billingCycle: string;
     currentPeriodEnd: string;
@@ -40,15 +46,22 @@ type DashboardOverview = {
   usage: {
     periodStart: string;
     periodEnd: string;
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
     postsUsed: number;
     postsRemaining: number;
     visualsUsed: number;
     visualsRemaining: number | null;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     visualsBonus: number;
 >>>>>>> 4d1cd4d (update)
+=======
+    visualsBonus: number;
+>>>>>>> xerox
     platformsUsed: number;
     platformsRemaining: number;
   };
@@ -74,6 +87,7 @@ type UpcomingPost = {
   targets: { platform: string; status: string }[];
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 // ---------------- Mock Data ----------------
 
@@ -114,6 +128,8 @@ const MOCK_PIPELINE = {
 
 =======
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
 // ---------------- Hooks ----------------
 
 function useDashboardOverview(enabled: boolean) {
@@ -196,17 +212,23 @@ export default function DashboardPage() {
   const alerts = alertsQ.data?.data.items || [];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const activityData = activity.length > 0 ? activity : MOCK_RECENT_ACTIVITY;
   const upcomingData = upcoming.length > 0 ? upcoming : MOCK_UPCOMING_POSTS;
   const alertsData = alerts.length > 0 ? alerts : MOCK_ALERTS;
   const pipelineData =
     pipeline && Object.keys(pipeline).length > 0 ? pipeline : MOCK_PIPELINE;
 =======
+=======
+>>>>>>> xerox
   const activityData = activity;
   const upcomingData = upcoming;
   const alertsData = alerts;
   const pipelineData = pipeline || {};
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
 
   const isLoading = overviewQ.isLoading;
 
@@ -242,6 +264,7 @@ export default function DashboardPage() {
         </Button>
       </div>
 
+<<<<<<< HEAD
 <<<<<<< HEAD
       {/* Plan & Usage */}
       <Section title="Plan & Usage">
@@ -288,6 +311,8 @@ export default function DashboardPage() {
             loading={isLoading}
           />
 =======
+=======
+>>>>>>> xerox
       {/* Plan Details */}
       <Section title="Plan Details">
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -327,12 +352,16 @@ export default function DashboardPage() {
           {overview?.socialAccounts.byPlatform && Object.entries(overview.socialAccounts.byPlatform).map(([platform, count]) => (
             <MetricCard key={platform} label={`${platform}`} value={count} loading={isLoading} />
           ))}
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
         </div>
       </Section>
 
       {/* Alerts */}
       <Section title={`System Alerts (${alertsData.length})`}>
+<<<<<<< HEAD
 <<<<<<< HEAD
         <div className="space-y-3">
           {alertsData.map((a, i) => (
@@ -354,6 +383,8 @@ export default function DashboardPage() {
           ))}
         </div>
 =======
+=======
+>>>>>>> xerox
         {alertsData.length === 0 ? (
           <p className="text-sm text-slate-400">No data available</p>
         ) : (
@@ -377,11 +408,15 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
       </Section>
 
       {/* Pipeline */}
       <Section title="Post Pipeline">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
           {Object.entries(pipelineData).map(([key, val]) => (
@@ -397,6 +432,8 @@ export default function DashboardPage() {
           ))}
         </div>
 =======
+=======
+>>>>>>> xerox
         {Object.keys(pipelineData).length === 0 ? (
           <p className="text-sm text-slate-400">No data available</p>
         ) : (
@@ -414,11 +451,15 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
       </Section>
 
       {/* Upcoming */}
       <Section title="Upcoming Posts">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <div className="space-y-3">
           {upcomingData.map((p) => (
@@ -442,6 +483,8 @@ export default function DashboardPage() {
           ))}
         </div>
 =======
+=======
+>>>>>>> xerox
         {upcomingData.length === 0 ? (
           <p className="text-sm text-slate-400">No data available</p>
         ) : (
@@ -467,11 +510,15 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
       </Section>
 
       {/* Recent Activity */}
       <Section title="Recent Activity">
+<<<<<<< HEAD
 <<<<<<< HEAD
         <div className="space-y-3">
           {activityData.map((a) => (
@@ -491,6 +538,8 @@ export default function DashboardPage() {
           ))}
         </div>
 =======
+=======
+>>>>>>> xerox
         {activityData.length === 0 ? (
           <p className="text-sm text-slate-400">No data available</p>
         ) : (
@@ -512,7 +561,10 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+<<<<<<< HEAD
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox
       </Section>
 
       {/* Links */}
@@ -581,6 +633,7 @@ function MetricCard({
     </Card>
   );
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 "use client";
@@ -975,3 +1028,5 @@ function MetricCard({
 >>>>>>> a150e68 (user dashboard overview mock data removed)
 =======
 >>>>>>> 4d1cd4d (update)
+=======
+>>>>>>> xerox

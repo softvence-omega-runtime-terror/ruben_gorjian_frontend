@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> xerox
 "use client";
 
 import Link from "next/link";
@@ -33,7 +36,11 @@ type NavSection = {
   items: NavItem[];
 };
 
+<<<<<<< HEAD
 const NAV_SECTIONS: NavSection[] = [
+=======
+export const NAV_SECTIONS: NavSection[] = [
+>>>>>>> xerox
   {
     items: [
       {
@@ -373,6 +380,7 @@ export function DashboardSidebar({
     </aside>
   );
 }
+<<<<<<< HEAD
 =======
 "use client";
 
@@ -749,3 +757,5 @@ export function DashboardSidebar({
   );
 }
 >>>>>>> d562463 (remove the search filed and set the path)
+=======
+>>>>>>> xerox
