@@ -57,7 +57,7 @@ const regularFullPlans: PlanDefinition[] = [
       {
         label: "We handle all posting",
         tooltip:
-          "Done-For-You Posting: Talexia handles all scheduling and publishing across your connected platform.",
+          "Done-For-You Posting. Talexia handles all scheduling and publishing across your connected platform.",
       },
       {
         label: "Up to 12 posts/month",
@@ -65,14 +65,14 @@ const regularFullPlans: PlanDefinition[] = [
           "Standard Posting Volume. Structured plan supporting up to 12 posts per month using your refreshed visual content.",
       },
       {
-        label: "Pro Photo Shoot (Every 3 months)",
+        label: "Pro Photo Shoot (Every 3 months) 1 Hr Session",
         tooltip:
           "Efficiency Production. A professional photo session conducted every 3 months to refresh your visual library. This is a streamlined, 60-minute session.",
       },
       {
         label: "We write captions & hashtags",
         tooltip:
-          "Strategic AI Copywriting. Includes professionally written captions and optimized hashtags tailored to your brand voice and positioning.",
+          "Strategic Al Copywriting. Includes professionally written captions and optimized hashtags tailored to your brand voice and positioning.",
       },
       {
         label: "1 platform included (+$5/mo per extra)",
@@ -99,7 +99,7 @@ const regularFullPlans: PlanDefinition[] = [
       {
         label: "We handle all posting",
         tooltip:
-          "Done-For-You Posting: Talexia handles all scheduling and publishing across your connected platform.",
+          "Done-For-You Posting.Talexia handles all scheduling and publishing across your connected platform.",
       },
       {
         label: "Up to 16 posts/month",
@@ -108,22 +108,22 @@ const regularFullPlans: PlanDefinition[] = [
       },
       {
         label: "2 platforms included (Instagram & Facebook)",
-        tooltip: "",
+        tooltip: "Dual-Platform Coverage. Full publishing and scheduling across 2 social platforms (Instagram & Facebook).",
       },
       {
-        label: "Pro Photo Shoot (Every 2 months)",
+        label: "Pro Photo Shoot (Every 2 months) 1.5 Hr Session",
         tooltip:
-          "Increased Production Frequency. Professional photo sessions every 2 months to maintain higher posting volume and visual freshness.",
+          "Increased Production Frequency.Professional photo sessions every 2 months to maintain higher posting volume and visual freshness.",
       },
       {
         label: "We write captions & hashtags",
         tooltip:
-          "Strategic AI Copywriting. Includes professionally written captions and optimized hashtags tailored to your brand voice and positioning.",
+          "Strategic Copywriting:Professionally written captions and optimized hashtags aligned with your brand positioning.",
       },
       {
         label: "Video add-ons available",
         tooltip:
-          "Video Add-On: Professional vertical reel production available as an add-on. Video Starting from $495/hr; pricing and scope depend on session requirements.",
+          "Video Add-On:Professional vertical reel production available as an add-on. Video Starting from $495/hr; pricing and scope depend on session requirements.",
       },
     ],
     ctaLabel: "Choose Plan",
@@ -142,31 +142,31 @@ const regularFullPlans: PlanDefinition[] = [
       {
         label: "We handle all posting",
         tooltip:
-          "Done-For-You Posting: Talexia handles scheduling and publishing across your connected platforms.",
+          "Done-For-You Posting. Talexia handles all scheduling and publishing across your connected platform.",
       },
       {
         label: "Up to 20 posts/month",
         tooltip:
-          "Maximum Posting Volume: Strategic management and publishing for up to 20 posts per month.",
+          "Maximum Posting Volume. Strategic management and publishing for up to 20 posts per month.",
       },
       {
         label: "3 platforms included (Instagram, Facebook & TikTok)",
-        tooltip: "",
+        tooltip: "Multi-Platform Dominance. Full publishing and scheduling across 3 social platforms: Instagram, Facebook, and TikTok.",
       },
       {
         label: "Video: 1 Full Reel + 3 Micro-Reels (Reels/TikToks)",
         tooltip:
-          'Hybrid Video Package: Includes 1 Cinematic Edited Reel plus 3 "Story Loops" (Micro-Reels) designed for daily engagement. Starting from $495/hr; pricing and scope depend on session requirements.',
+          'Hybrid Video Package. Includes 1 Cinematic Edited Reel plus 3 "Story Loops" (Micro-Reels) designed for daily engagement.Starting from $495/hr; pricing and scope depend on session requirements.',
       },
       {
-        label: "Pro Photo Shoot (Every month)",
+        label: "Pro Photo Shoot (Every month) 3 Hrs Session",
         tooltip:
-          "Maximum Production Frequency. Professional photo sessions every month to maintain highest posting volume and visual freshness.",
+          "Monthly Production Elite. Professional on-site production every month to support ongoing creative output and seasonal menu changes.",
       },
       {
         label: "We write captions & hashtags",
         tooltip:
-          "Strategic Copywriting: Professionally written captions and optimized hashtags aligned with your brand positioning.",
+          "Maximum Posting Volume. Strategic management and publishing for up to 20 posts per month.",
       },
     ],
     ctaLabel: "Choose Plan",

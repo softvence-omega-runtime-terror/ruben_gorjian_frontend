@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans dark", geist.variable)}>
+    <html lang="en" data-scroll-behavior="smooth" className={cn("font-sans dark", geist.variable)}>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
@@ -36,7 +36,22 @@ export default function RootLayout({
       <body suppressHydrationWarning 
         className={`${stack_sans_notch.variable} ${poppins.variable} ${sora.variable} ${stack_sans_notch.className} ${poppins.className} min-h-screen antialiased bg-slate-950 px-2 sm:px-0`}
       >
-        <Toaster position="top-right" expand={false} richColors />
+        <Toaster
+          position="top-right"
+          expand={false}
+          theme="dark"
+          toastOptions={{
+            classNames: {
+              toast: "bg-slate-900 border border-slate-800 text-slate-100 shadow-xl",
+              title: "text-white",
+              description: "text-slate-300",
+              success: "border-lime-400/40",
+              error: "border-red-500/40",
+              warning: "border-amber-400/40",
+              info: "border-sky-400/40",
+            },
+          }}
+        />
         <ErrorBoundary>
           <SessionProvider>
             <QueryProvider>

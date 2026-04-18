@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Filter
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   flexRender, 
@@ -556,14 +557,23 @@ export default function AdminSubscriptionsPage() {
                 'This will fetch the latest status and period dates directly from Stripe.'}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-6 flex gap-3 sm:justify-center">
-            <Button variant="outline" onClick={() => setConfirmAction(null)} className="border-slate-800">
+          <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-4 sm:justify-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setConfirmAction(null)} 
+              className="border-slate-800 bg-slate-900/50 text-slate-300 hover:bg-slate-800 hover:text-white font-black px-8 py-6 rounded-2xl transition-all hover:scale-105 active:scale-95 text-base order-2 sm:order-1"
+            >
               Go Back
             </Button>
             <Button 
               variant={confirmAction?.type === 'cancel-immediate' ? 'destructive' : 'default'}
               onClick={handleConfirmAction}
-              className={confirmAction?.type === 'resume' ? 'bg-lime-500 hover:bg-lime-600' : ''}
+              className={cn(
+                "font-black px-8 py-6 rounded-2xl transition-all hover:scale-105 active:scale-95 text-base order-1 sm:order-2",
+                confirmAction?.type === 'cancel-immediate' ? 'bg-rose-600 hover:bg-rose-500 shadow-[0_15px_30px_rgba(225,29,72,0.3)] border-none' : 
+                confirmAction?.type === 'resume' ? 'bg-lime-500 hover:bg-lime-600 text-slate-950 shadow-[0_15px_30px_rgba(34,197,94,0.3)]' :
+                'bg-lime-400 hover:bg-lime-300 text-slate-950 shadow-[0_15px_30px_rgba(163,230,53,0.3)]'
+              )}
               disabled={
                 refreshMutation.isPending || 
                 cancelScheduleMutation.isPending || 
@@ -646,8 +656,12 @@ export default function AdminSubscriptionsPage() {
             </Table>
           </div>
           
-          <div className="mt-4 pt-4 border-t border-white/5">
-             <Button variant="outline" className="w-full border-slate-800" onClick={() => setInvoiceUserId(null)}>
+          <div className="mt-6 pt-4 border-t border-white/5">
+             <Button 
+               variant="outline" 
+               className="w-full border-slate-800 bg-slate-900/50 text-slate-300 hover:bg-slate-800 hover:text-white font-black px-8 py-6 rounded-2xl transition-all hover:scale-105 active:scale-95 text-base" 
+               onClick={() => setInvoiceUserId(null)}
+             >
                Close History
              </Button>
           </div>

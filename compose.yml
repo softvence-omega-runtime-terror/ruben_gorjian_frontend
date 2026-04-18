@@ -1,0 +1,9 @@
+services:
+  web:
+    image: softvence/talexia_frontend:latest
+    container_name: "Talexia-Frontend"
+    env_file:
+      - .env.production
+    ports:
+      - 3000:3000
+    restart: unless-stopped

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getUserSettings } from "@/app/dashboard/settings/utils";
 import { getUserTimezone, getTimezoneAbbr, getTimezoneDisplayName } from "@/lib/timezone";
 
@@ -32,13 +32,17 @@ export function useTimezone() {
     loadTimezone();
   }, []);
 
-  return {
+  const abbr = useMemo(() => getTimezoneAbbr(timezone), [timezone]);
+  const displayName = useMemo(() => getTimezoneDisplayName(timezone), [timezone]);
+
+  return useMemo(() => ({
     timezone,
-    timezoneAbbr: getTimezoneAbbr(timezone),
-    timezoneDisplayName: getTimezoneDisplayName(timezone),
+    timezoneAbbr: abbr,
+    timezoneDisplayName: displayName,
     loading,
-  };
+  }), [timezone, abbr, displayName, loading]);
 }
+
 
 
 

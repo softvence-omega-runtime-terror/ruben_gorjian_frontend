@@ -390,7 +390,7 @@ export default function AdminCouponsPage() {
             setEditingCoupon(null);
             setIsCreateDialogOpen(true);
           }}
-          className="bg-gradient-to-r from-lime-500 to-emerald-500 hover:from-lime-400 hover:to-emerald-400 text-slate-950 font-bold gap-2 px-6 shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all hover:scale-105 active:scale-95"
+          className="bg-lime-400 hover:bg-lime-300 text-slate-950 font-black gap-2 px-8 py-6 rounded-2xl shadow-[0_15px_30px_rgba(163,230,53,0.3)] transition-all hover:scale-105 active:scale-95 text-base"
         >
           <Plus className="h-5 w-5" /> Create Coupon
         </Button>
@@ -438,31 +438,43 @@ export default function AdminCouponsPage() {
               </TableBody>
             </Table>
 
-            {/* Pagination */}
+            {/* ── Pagination Footer ── */}
             {data?.pagination && data.pagination.pages > 1 && (
-              <div className="flex items-center justify-between px-4 py-4 border-t border-slate-800 bg-slate-800/20">
-                <div className="text-xs text-slate-500">
-                  Showing page {data.pagination.page} of {data.pagination.pages} ({data.pagination.total} total)
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 border-slate-700 bg-slate-900 text-slate-300 hover:text-white"
-                    disabled={page === 1}
-                    onClick={() => setPage(p => p - 1)}
+              <div className="mt-6 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 px-6 pb-6 border-t border-slate-800 bg-slate-800/20">
+                
+                {/* Left: results info */}
+                <p className="text-[11px] font-semibold text-slate-500 tracking-wide uppercase">
+                  Showing page{" "}
+                  <span className="text-slate-300 font-black">{data.pagination.page}</span>
+                  {" "}of{" "}
+                  <span className="text-slate-300 font-black">{data.pagination.pages}</span>
+                  {" "}·{" "}
+                  <span className="text-slate-300 font-black">{data.pagination.total}</span> total coupons
+                </p>
+
+                {/* Right: Prev / Next */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={isLoading || page <= 1}
+                    className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-700 bg-slate-800/60 text-[11px] font-black text-slate-300 uppercase tracking-widest transition-all duration-200 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-300 disabled:opacity-25 disabled:cursor-not-allowed"
                   >
-                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 border-slate-700 bg-slate-900 text-slate-300 hover:text-white"
-                    disabled={page === data.pagination.pages}
-                    onClick={() => setPage(p => p + 1)}
+                    <ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+                    Previous
+                  </button>
+
+                  <div className="bg-slate-800/50 px-4 py-1.5 rounded-lg border border-slate-700/50">
+                    <span className="text-xs font-black text-lime-400">Page {data.pagination.page}</span>
+                  </div>
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(data.pagination.pages, p + 1))}
+                    disabled={isLoading || page >= data.pagination.pages}
+                    className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-transparent bg-gradient-to-r from-lime-500/80 to-emerald-600/80 text-[11px] font-black text-white uppercase tracking-widest shadow-md shadow-lime-400/10 transition-all duration-200 hover:from-lime-400 hover:to-emerald-500 hover:shadow-lime-400/25 disabled:opacity-25 disabled:cursor-not-allowed disabled:shadow-none"
                   >
-                    Next <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
+                    Next Page
+                    <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </button>
                 </div>
               </div>
             )}
@@ -607,18 +619,18 @@ export default function AdminCouponsPage() {
               </div>
             </div>
 
-            <DialogFooter className="pt-4">
+            <DialogFooter className="gap-4 pt-4">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsCreateDialogOpen(false)}
-                className="border-slate-800 bg-transparent text-slate-300 hover:bg-slate-800"
+                className="border-slate-800 bg-slate-900/50 text-slate-300 hover:bg-slate-800 hover:text-white font-black px-8 py-6 rounded-2xl transition-all hover:scale-105 active:scale-95 text-base"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="bg-gradient-to-r from-lime-500 to-emerald-500 hover:from-lime-400 hover:to-emerald-400 text-slate-950 font-bold px-8 shadow-[0_0_20px_rgba(132,204,22,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-lime-400 hover:bg-lime-300 text-slate-950 font-black gap-2 px-8 py-6 rounded-2xl shadow-[0_15px_30px_rgba(163,230,53,0.3)] transition-all hover:scale-105 active:scale-95 text-base"
                 disabled={createMutation.isPending || updateMutation.isPending}
               >
                 {(createMutation.isPending || updateMutation.isPending) ? (
@@ -628,7 +640,7 @@ export default function AdminCouponsPage() {
                 ) : (
                   <Plus className="mr-2 h-4 w-4" />
                 )}
-                {editingCoupon ? "Save Changes" : "Confirm Creation"}
+                {editingCoupon ? "Save Coupon Changes" : "Confirm Coupon Creation"}
               </Button>
             </DialogFooter>
           </form>
@@ -644,11 +656,11 @@ export default function AdminCouponsPage() {
               Are you sure you want to delete coupon <span className="text-white font-bold">{couponToDelete?.code}</span>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="pt-4">
+          <DialogFooter className="gap-4 pt-4">
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="border-slate-800 bg-transparent text-slate-300 hover:bg-slate-800"
+              className="border-slate-800 bg-slate-900/50 text-slate-300 hover:bg-slate-800 hover:text-white font-black px-8 py-6 rounded-2xl transition-all hover:scale-105 active:scale-95 text-base"
             >
               Cancel
             </Button>
@@ -656,6 +668,7 @@ export default function AdminCouponsPage() {
               variant="destructive" 
               onClick={() => couponToDelete && deleteMutation.mutate(couponToDelete.id)}
               disabled={deleteMutation.isPending}
+              className="bg-rose-600 hover:bg-rose-500 text-white font-black px-8 py-6 rounded-2xl shadow-[0_15px_30px_rgba(225,29,72,0.3)] transition-all hover:scale-105 active:scale-95 text-base border-none"
             >
               {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Delete Coupon

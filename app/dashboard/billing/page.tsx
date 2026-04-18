@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tooltip } from "react-tooltip";
 import { getCustomerPortalUrl } from "./utils";
 import type { Invoice, Plan } from "./types";
 import { apiGet, apiPost } from "@/lib/api";
@@ -37,9 +38,9 @@ import { getPlanByLookupKey } from "@/lib/pricing-catalog";
 import { cn } from "@/lib/utils";
 
 const PLAN_SUBTITLES: Record<PlanKey, string> = {
-  "FMP-20": "Done-for-you management at starter volume.",
-  "FMP-35": "Our most selected full management tier.",
-  "FM-70": "High-output execution for multi-client agencies.",
+  "FMP-20": "Complete done-for-you posting",
+  "FMP-35": "More content. Broader reach.",
+  "FM-70": "Your dedicated digital marketing team",
 };
 
 const PLAN_BADGES: Partial<Record<PlanKey, string>> = {
@@ -125,7 +126,7 @@ export default function BillingPage() {
       : null;
     
     // Exact price from plan object
-    let priceCents = plan.price > 0 ? plan.price : 0;
+    const priceCents = plan.price > 0 ? plan.price : 0;
     
     // If it's a yearly plan, we might want to show the monthly equivalent if the price is high
     const isYearly = plan.interval === "year";
@@ -629,7 +630,7 @@ export default function BillingPage() {
             </div>
           )}
           {plansExpanded && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <div className="grid gap-4 max-w-7xl mx-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {allPlans
                 .filter((p) => p.category === "FULL_MANAGEMENT") // Only show main management plans
                 .map((catalogPlan) => {
@@ -673,7 +674,7 @@ export default function BillingPage() {
 
                   const billingNote = billingCycle === "yearly"
                     ? `Billed annually (${formatPlanPrice(totalYearlyPrice)}/year)`
-                    : "Billed monthly";
+                    : "Per month";
 
                   return (
                     <article
@@ -742,27 +743,36 @@ export default function BillingPage() {
 
                     {/* Features from catalog as fallback */}
                     {getPlanByLookupKey(planKey)?.features && (
-                      <ul className="mt-5 space-y-2">
-                        {getPlanByLookupKey(planKey)?.features.map((feature, idx) => (
-                          <li
-                            key={
-                              typeof feature === "string"
-                                ? feature
-                                : feature.label + String(idx)
-                            }
-                            className="flex items-start gap-2 text-sm text-slate-400"
-                          >
-                            <Check className="mt-0.5 h-4 w-4 shrink-0 text-lime-400" />
-                            <span>
-                              {typeof feature === "string"
-                                ? feature
-                                : feature.label}
-                            </span>
-                          </li>
-                        ))}
+                      <ul className="mt-5 space-y-2 text-left">
+                        {getPlanByLookupKey(planKey)?.features.map((feature, idx) => {
+                          const label = typeof feature === "string" ? feature : feature.label;
+                          const tooltip = typeof feature === "string" ? null : feature.tooltip;
+                          return (
+                            <li
+                              key={label + String(idx)}
+                              {...(tooltip
+                                ? {
+                                    "data-tooltip-id": `pricing-tooltip-billing-${planKey}`,
+                                    "data-tooltip-content": tooltip,
+                                  }
+                                : {})}
+                              className="flex items-start gap-2 text-sm text-slate-300"
+                            >
+                              <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#4a5dff]" />
+                              <span>{label}</span>
+                            </li>
+                          );
+                        })}
                       </ul>
                     )}
+                    <Tooltip
+                      id={`pricing-tooltip-billing-${planKey}`}
+                      className="!bg-slate-900 max-w-xs !text-slate-200 !border !border-slate-800 !rounded-xl !p-3 !text-xs !shadow-2xl !opacity-100 z-50"
+                      noArrow={false}
+                    />
                   </article>
+
+
                 );
               })}
             </div>

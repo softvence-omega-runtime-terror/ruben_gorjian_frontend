@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo } from "react";
+import { toast as sonnerToast } from "sonner";
 
 interface Toast {
   title: string;
@@ -7,33 +8,19 @@ interface Toast {
 }
 
 export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const timeoutsRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
-
-  useEffect(() => {
-    return () => {
-      timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
-      timeoutsRef.current = [];
-    };
+  const toast = useCallback(({ title, description, variant = 'default' }: Toast) => {
+    if (variant === 'destructive') {
+      sonnerToast.error(title, {
+        description: description,
+      });
+    } else {
+      sonnerToast.success(title, {
+        description: description,
+      });
+    }
   }, []);
 
-  const toast = ({ title, description, variant = 'default' }: Toast) => {
-    // Simple console logging for now - can be enhanced with actual toast UI later
-    if (variant === 'destructive') {
-      console.error(`Toast Error: ${title}`, description);
-    } else {
-      console.log(`Toast: ${title}`, description);
-    }
-    
-    // Add to toasts array (for future UI implementation)
-    setToasts(prev => [...prev, { title, description, variant }]);
-    
-    // Auto-remove after 3 seconds
-    const timeoutId = setTimeout(() => {
-      setToasts(prev => prev.slice(1));
-    }, 3000);
-    timeoutsRef.current.push(timeoutId);
-  };
-
-  return { toast, toasts };
+  return useMemo(() => ({ toast }), [toast]);
 }
+
+

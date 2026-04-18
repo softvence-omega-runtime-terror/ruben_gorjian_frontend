@@ -166,12 +166,21 @@ function BillingSuccessContent() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/onboarding"
-            className="inline-flex items-center justify-center rounded-full bg-lime-500 px-8 py-4 text-base font-bold text-slate-950 hover:bg-lime-400 shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Start Onboarding
-          </Link>
+          {session?.onboardingCompleted ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center rounded-full bg-lime-500 px-8 py-4 text-base font-bold text-slate-950 hover:bg-lime-400 shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/onboarding"
+              className="inline-flex items-center justify-center rounded-full bg-lime-500 px-8 py-4 text-base font-bold text-slate-950 hover:bg-lime-400 shadow-[0_0_20px_rgba(132,204,22,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Start Onboarding
+            </Link>
+          )}
         </div>
       </div>
     </div>

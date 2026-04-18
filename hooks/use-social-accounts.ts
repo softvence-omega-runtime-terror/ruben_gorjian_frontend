@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export interface SocialAccount {
@@ -48,7 +48,8 @@ export function useSocialAccounts() {
       setLoading(false);
     }
   }, [toast]);
-  const connectPlatform = async (platform: string) => {
+
+  const connectPlatform = useCallback(async (platform: string) => {
     try {
       const response = await fetch("/api/social-media/platform/connect-link", {
         method: "POST",
@@ -84,22 +85,22 @@ export function useSocialAccounts() {
       });
       throw error;
     }
-  };
+  }, [toast]);
 
-  const disconnectAccount = async (accountId: string) => {
+  const disconnectAccount = useCallback(async (accountId: string) => {
     try {
       const response = await fetch("/api/social-media/platform/disconnect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ accountId }), // User's API uses 'platform' but disconnect uses accountId or platform? I'll assume accountId based on previous logic.
+        body: JSON.stringify({ accountId }),
       });
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      setAccounts(accounts.filter((acc) => acc.id !== accountId));
+      setAccounts(prev => prev.filter((acc) => acc.id !== accountId));
       toast({ title: "Success", description: "Account disconnected" });
     } catch (error) {
       console.error("Disconnect error:", error);
@@ -109,17 +110,17 @@ export function useSocialAccounts() {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
 
-  return {
+  return useMemo(() => ({
     accounts,
     loading,
     connectPlatform,
     disconnectAccount,
     refetch: fetchAccounts,
-  };
-}
+  }), [accounts, loading, connectPlatform, disconnectAccount, fetchAccounts]);
+}

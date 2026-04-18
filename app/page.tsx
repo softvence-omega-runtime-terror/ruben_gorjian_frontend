@@ -23,15 +23,15 @@ import { PLAN_KEYS, type PlanKey } from "@/lib/pricing-comparison";
 import { persistPlanSelection } from "@/lib/plan-selection";
 import { useUiStore } from "@/store/uiStore";
 import { Tooltip } from "react-tooltip";
-import {ScanFace} from 'lucide-react'
+import {ScanFace, Sparkles} from 'lucide-react'
 import { Button } from "@/components/ui/button";
 
 type BillingCycle = "monthly" | "yearly";
 
 const PLAN_SUBTITLES: Record<PlanKey, string> = {
-  "FMP-20": "Done-for-you management at starter volume.",
-  "FMP-35": "Our most selected full management tier.",
-  "FM-70": "High-output execution for multi-client agencies.",
+  "FMP-20": "Complete done-for-you posting",
+  "FMP-35": "More content. Broader reach.",
+  "FM-70": "Your dedicated digital marketing team",
 };
 
 const PLAN_BADGES: Partial<Record<PlanKey, string>> = {
@@ -173,7 +173,7 @@ export default function HomePage() {
         displayPrice: active,
         billingNote:
           billingCycle === "monthly"
-            ? "Billed monthly"
+            ? "Per month"
             : `Billed annually (${formatPrice(yearlyMonthlyEquivalent * 12)}/year)`,
       };
     }).filter(Boolean) as Array<{
@@ -240,6 +240,14 @@ export default function HomePage() {
                 className="rounded-full px-8"
               >
                 <Link href="/pricing">Signup</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8"
+              >
+                <Link href="/case-studies">Case Studies</Link>
               </Button>
               <Button
                 asChild
@@ -436,9 +444,9 @@ export default function HomePage() {
             <Button asChild size="lg" variant="shiny" className="rounded-full px-8">
               <Link href="/pricing">Choose your plan</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full px-8">
+            {/* <Button asChild size="lg" variant="outline" className="rounded-full px-8">
               <a href="/contact">Talk to sales</a>
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>
@@ -483,34 +491,37 @@ export default function HomePage() {
       {/* Pricing Plan Start */}
       <section className="px-4 pb-16">
         <div className="space-y-10">
-          <div className="mx-auto flex w-full max-w-4xl flex-row flex-wrap items-center justify-center gap-4 rounded-2xl p-4">
-            <div className="inline-flex rounded-full bg-primary p-1.5 shadow-inner">
-              <Button
+          <div className="mx-auto flex w-full max-w-4xl flex-row items-center justify-center">
+            <div className="inline-flex items-center rounded-full border-2 border-primary bg-primary p-1 gap-1 shadow-lg">
+              <button
                 type="button"
-                variant={billingCycle === "monthly" ? "secondary" : "ghost"}
                 onClick={() => setBillingCycle("monthly")}
                 className={cn(
-                  "rounded-full px-6 py-2 text-sm font-semibold transition-all duration-300",
-                  billingCycle === "monthly" 
-                    ? "bg-slate-50 text-primary shadow-lg shadow-black/5 scale-[1.02]" 
-                    : "bg-transparent text-white/70 hover:text-white hover:bg-white/5"
+                  "rounded-full px-7 py-2 text-sm font-bold transition-all duration-300 select-none",
+                  billingCycle === "monthly"
+                    ? "bg-white text-primary shadow-md"
+                    : "bg-transparent text-white hover:bg-white/10"
                 )}
               >
                 Monthly
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant={billingCycle === "yearly" ? "secondary" : "ghost"}
                 onClick={() => setBillingCycle("yearly")}
                 className={cn(
-                  "rounded-full px-6 py-2 text-sm font-semibold transition-all duration-300",
-                  billingCycle === "yearly" 
-                    ? "bg-slate-50 text-primary shadow-lg shadow-black/5 scale-[1.02]" 
-                    : "bg-transparent text-white/70 hover:text-white hover:bg-white/5"
+                  "rounded-full px-7 py-2 text-sm font-bold transition-all duration-300 select-none",
+                  billingCycle === "yearly"
+                    ? "bg-white text-primary shadow-md"
+                    : "bg-transparent text-white hover:bg-white/10"
                 )}
               >
                 Yearly
-              </Button>
+                {billingCycle !== "yearly" && (
+                  <span className="ml-2 rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    Save 20%
+                  </span>
+                )}
+              </button>
             </div>
           </div>
           <div
@@ -544,14 +555,16 @@ export default function HomePage() {
                       {formatPrice(displayPrice)}
                     </p>
                     <p className="mt-2 text-xs text-[#6c6f7d]">{billingNote}</p>
-                    <Button
-                      type="button"
+                    <button
                       onClick={() => handleSelectPlan(key)}
-                      variant={isHighlighted ? "shiny" : "outline"}
-                      className="mt-5 w-full rounded-full"
+                      className={`mt-5 w-full rounded-full px-4 py-3 text-sm font-bold transition-all duration-200 ${
+                        isHighlighted
+                          ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-[1.02] active:scale-[0.98]"
+                          : "bg-primary text-white hover:bg-primary/85 hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
+                      }`}
                     >
-                      {plan.ctaLabel}
-                    </Button>
+                      {isAuthenticated ? "Choose Plan" : "Sign Up"}
+                    </button>
                     <ul className="mt-5 space-y-2">
                       {plan.features.map((feature, idx) => (
                         <li
@@ -621,11 +634,10 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 space-y-2 px-6 pb-6 text-center mx-auto">
+            <div className="mt-8 space-y-4 px-6 pb-6 text-center mx-auto">
               <Button
                 size="lg"
-                variant="shiny"
-                className="rounded-xl px-8 py-8 text-2xl font-bold font-sora h-auto"
+                className="w-full max-w-[450px] mx-auto rounded-xl bg-[#1c2231] px-8 py-4 text-xl font-bold font-sora text-white transition-all duration-300 hover:bg-[#1c2231]/95 hover:shadow-xl active:scale-[0.98] h-auto"
                 onClick={() => {
                   window.location.href =
                     "https://rgp.17hats.com/p#/lcf/vgbbgkzhtwtrvdpzdxdnvpxcszpwwbkk";
@@ -633,14 +645,14 @@ export default function HomePage() {
               >
                 Book a Production Consultation
               </Button>
-              <p className="text-sm text-[#55596a] font-semibold ">
-                Limited availability per month. Secure your date 4 weeks in
-                advance
-              </p>
-              <p className="text-sm text-[#55596a]">
-                Redirecting to the Ruben Gorjian Photography secure booking
-                portal.
-              </p>
+              <div className="space-y-1">
+                <p className="text-xl font-bold text-[#1c2231] font-sora">
+                  Limited availability per month. Secure your date 4 weeks in advance
+                </p>
+                <p className="text-base text-[#1c2231]/80 font-poppins">
+                  Redirecting to the Ruben Gorjian Photography secure booking portal.
+                </p>
+              </div>
             </div>
           </div>
         </div>

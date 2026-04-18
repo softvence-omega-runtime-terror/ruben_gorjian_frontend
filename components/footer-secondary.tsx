@@ -102,10 +102,10 @@ export default function FooterSecondary() {
               />
               TALEXIA
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-white/90">
+            {/* <p className="mt-3 max-w-xs text-sm text-white/90">
               Your AI-powered social media team. Plan, create, and schedule
               content that stays on brand.
-            </p>
+            </p> */}
             {/* Newsletter form start here */}
             <div className="mt-10 space-y-4 text-white">
               <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-white font-sora">

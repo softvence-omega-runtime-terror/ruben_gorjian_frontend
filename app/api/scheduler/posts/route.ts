@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL =
   process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  process.env.ANOTHER_BACKEND_API_URL ||
   "http://localhost:4000";
 
 export async function GET(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const token = cookieStore.get("token")?.value;
 
     let body: any;
-    let headers: Record<string, string> = {
+    const headers: Record<string, string> = {
       ...(token ? { Cookie: `token=${token}` } : {}),
     };
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers,
       body,
-      // @ts-ignore - duplex is required for streaming request bodies in new fetch
+      // @ts-expect-error - duplex is required for streaming request bodies in new fetch
       duplex: 'half',
     });
 

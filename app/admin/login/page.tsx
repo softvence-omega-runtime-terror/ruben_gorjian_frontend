@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Lock, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSessionContext } from "@/context/SessionContext";
 
@@ -12,6 +12,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already logged in as admin
   useEffect(() => {
@@ -87,14 +88,24 @@ export default function AdminLoginPage() {
             <label className="text-sm text-slate-300">Password</label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-white"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-white pr-10"
                 placeholder="••••••••"
               />
-              <Lock className="h-4 w-4 text-slate-500 absolute right-3 top-3" />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
           </div>
 

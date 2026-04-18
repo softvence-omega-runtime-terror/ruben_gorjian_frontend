@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import { memo, useRef, useEffect } from "react";
@@ -277,7 +276,7 @@ CalendarItem.displayName = "CalendarItem";
 =======
 "use client";
 
-import { memo, useRef, useEffect } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { useDrag } from "react-dnd";
 import dayjs from "dayjs";
@@ -287,6 +286,12 @@ import { FaInstagram, FaFacebook, FaLinkedin, FaTiktok } from "react-icons/fa";
 import type { Dayjs } from "dayjs";
 import { buildStorageUrl } from "@/lib/storage-utils";
 import { useSessionContext } from "@/context/SessionContext";
+import { useCalendar } from "@/app/dashboard/calendar/calendar-context";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type CalendarPost = {
   id: string;
@@ -355,6 +360,8 @@ export const CalendarItem = memo<CalendarItemProps>(
     onDelete,
     onPublish,
   }) => {
+    const { timezone: userTimezone } = useCalendar();
+    const [showRawTime, setShowRawTime] = useState(false);
     // date and display are part of the public props but not used in this compact view
     // Prevent dragging POSTED posts
     const canDrag = post.status !== "POSTED";
@@ -490,14 +497,31 @@ export const CalendarItem = memo<CalendarItemProps>(
             )}
           </div>
 
-          {/* Time only - details in modal */}
           <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
             {post.status === "DRAFT" ? "Draft " : ""}
-            {dayjs(post.scheduledFor).format("HH:mm")}
+            {userTimezone 
+              ? dayjs.tz(post.scheduledFor, userTimezone).format("HH:mm")
+              : dayjs(post.scheduledFor).format("HH:mm")}
           </span>
 
+          {showRawTime && (
+            <div className="absolute top-full left-0 z-[100] bg-black text-[10px] text-amber-400 p-1 rounded border border-amber-500 whitespace-nowrap pointer-events-none">
+              Raw: {post.scheduledFor}
+            </div>
+          )}
+
           {/* Hover actions */}
-          <div className="hidden group-hover:flex items-center gap-0.5 flex-shrink-0 ml-auto">
+          <div className="hidden group-hover:flex items-center gap-0.5 flex-shrink-0 ml-auto mr-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowRawTime(!showRawTime);
+              }}
+              className="p-1 text-slate-400 hover:text-amber-400 transition-colors"
+              title="Toggle raw data view"
+            >
+              <AlertCircle className="h-3 w-3" />
+            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -550,4 +574,4 @@ export const CalendarItem = memo<CalendarItemProps>(
 );
 
 CalendarItem.displayName = "CalendarItem";
->>>>>>> xerox
+

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import {
@@ -613,7 +612,12 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { useTimezone } from "@/hooks/use-timezone";
-import { fromUTC, toUTC } from "@/lib/timezone";
+import {
+  fromUTC,
+  formatForDateTimeLocal,
+  parseDateTimeLocal,
+  toUTC,
+} from "@/lib/timezone";
 import { useUiStore } from "@/store/uiStore";
 import { useSocket } from "@/app/providers/SocketProvider";
 
@@ -697,7 +701,7 @@ interface CalendarContextType {
 
 interface CreatePostData {
   caption: string;
-  scheduledFor: Date;
+  scheduledFor: string;
   platforms: string[];
   socialAccountIds: string[];
   assetId?: string;
@@ -898,12 +902,15 @@ export function CalendarProvider({
           : (data.items || data.posts || []);
         
         // Convert post dates from UTC to user timezone for display
-        const postsWithTimezone = rawPosts.map((post: any) => ({
-          ...post,
-          scheduledFor: post.scheduledFor
-            ? fromUTC(post.scheduledFor, userTimezone).format("YYYY-MM-DD HH:mm:ss")
-            : post.scheduledFor,
-        }));
+        const postsWithTimezone = rawPosts.map((post: any) => {
+          const dateValue = post.scheduledFor || post.scheduledAt;
+          return {
+            ...post,
+            scheduledFor: dateValue
+              ? fromUTC(dateValue, userTimezone).format()
+              : dateValue,
+          };
+        });
         setPosts(postsWithTimezone);
       }
     } catch (error) {
@@ -950,13 +957,13 @@ export function CalendarProvider({
           throw new Error("Timezone not ready. Please try again.");
         }
         // Convert scheduledFor from user timezone to UTC
+        const dateISO = parseDateTimeLocal(data.scheduledFor, userTimezone).toISOString();
         const payload = {
           ...data,
-          scheduledAt: toUTC(dayjs(data.scheduledFor), userTimezone).toISOString(),
+          scheduledAt: dateISO,
+          scheduledFor: dateISO,
           ...(targetUserId ? { userId: targetUserId, adminReason: "Created from admin dashboard" } : {}),
         };
-        // Remove scheduledFor if it exists in data to avoid confusion
-        if ('scheduledFor' in payload) delete (payload as any).scheduledFor;
 
         const response = await fetch("/api/scheduler/posts", {
           method: "POST",
@@ -989,11 +996,13 @@ export function CalendarProvider({
           ...data,
           caption: data.caption || ".",
           ...(data.scheduledFor
-            ? { scheduledAt: toUTC(dayjs(data.scheduledFor), userTimezone).toISOString() }
+            ? { 
+                scheduledAt: parseDateTimeLocal(data.scheduledFor, userTimezone).toISOString(),
+                scheduledFor: parseDateTimeLocal(data.scheduledFor, userTimezone).toISOString()
+              }
             : {}),
           ...(targetUserId ? { userId: targetUserId, adminReason: data.adminReason || "Updated from admin dashboard" } : {}),
         };
-        if ('scheduledFor' in payload) delete (payload as any).scheduledFor;
 
         const response = await fetch(`/api/scheduler/posts/${id}`, {
           method: "PATCH",
@@ -1044,11 +1053,11 @@ export function CalendarProvider({
       if (!post) return;
 
       // post.scheduledFor is already in user timezone (from fetchPosts conversion)
-      const scheduledDate = dayjs(post.scheduledFor).add(1, "hour");
+      const scheduledDate = dayjs.tz(post.scheduledFor, userTimezone).add(1, "hour");
 
       const duplicateData: CreatePostData = {
         caption: post.caption + " (Copy)",
-        scheduledFor: scheduledDate.toDate(), // Will be converted to UTC in createPost
+        scheduledFor: scheduledDate.format("YYYY-MM-DDTHH:mm"), // Pass formatted string to createPost
         platforms: post.targets.map((t) => t.platform),
         socialAccountIds: post.targets
           .map((t) => t.socialAccount?.id)
@@ -1069,7 +1078,7 @@ export function CalendarProvider({
   const movePost = useCallback(
     async (id: string, newDate: dayjs.Dayjs) => {
       await updatePost(id, {
-        scheduledFor: newDate.toDate(),
+        scheduledFor: newDate.format("YYYY-MM-DDTHH:mm"),
       });
     },
     [updatePost]
@@ -1192,4 +1201,4 @@ export function useCalendar() {
   }
   return context;
 }
->>>>>>> xerox
+

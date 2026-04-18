@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
+
 
 interface PresignResponse {
   uploadUrl: string | null;
@@ -14,7 +15,7 @@ export function useUpload() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const presign = async (fileName: string, contentType?: string) => {
+  const presign = useCallback(async (fileName: string, contentType?: string) => {
     const res = await fetch("/api/uploads/presign", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,9 +27,9 @@ export function useUpload() {
       throw new Error(err.error || "Failed to presign upload");
     }
     return (await res.json()) as PresignResponse;
-  };
+  }, []);
 
-  const createAssetRecord = async (storageKey: string, contentType?: string) => {
+  const createAssetRecord = useCallback(async (storageKey: string, contentType?: string) => {
     const res = await fetch("/api/uploads/asset", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -41,9 +42,9 @@ export function useUpload() {
     }
     const json = (await res.json()) as FinalizeResponse;
     return json.asset;
-  };
+  }, []);
 
-  const uploadFile = async (file: File): Promise<FinalizeResponse["asset"]> => {
+  const uploadFile = useCallback(async (file: File): Promise<FinalizeResponse["asset"]> => {
     setUploading(true);
     setError(null);
     try {
@@ -72,7 +73,8 @@ export function useUpload() {
     } finally {
       setUploading(false);
     }
-  };
+  }, [presign, createAssetRecord]);
 
-  return { uploadFile, uploading, error };
+  return useMemo(() => ({ uploadFile, uploading, error }), [uploadFile, uploading, error]);
 }
+

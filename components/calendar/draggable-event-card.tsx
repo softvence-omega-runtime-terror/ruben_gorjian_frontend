@@ -8,6 +8,12 @@ import dayjs from "dayjs";
 import clsx from "clsx";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { buildStorageUrl } from "@/lib/storage-utils";
+import { useCalendar } from "@/app/dashboard/calendar/calendar-context";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type CalendarPost = {
   id: string;
@@ -64,6 +70,7 @@ export function DraggableEventCard({
   spanEnd,
   onDragEnd,
 }: DraggableEventCardProps) {
+  const { timezone: userTimezone } = useCalendar();
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
@@ -103,7 +110,9 @@ export function DraggableEventCard({
       ? [post.hashtags]
       : [];
 
-  const timeStr = dayjs(post.scheduledFor).format("HH:mm");
+  const timeStr = userTimezone 
+    ? dayjs.tz(post.scheduledFor, userTimezone).format("HH:mm")
+    : dayjs(post.scheduledFor).format("HH:mm");
   const platforms = post.targets.map((t) => t.platform);
 
   // Handle long press for mobile

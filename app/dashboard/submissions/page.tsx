@@ -255,7 +255,22 @@ export default function SubmissionsPage() {
       }>(`/api/submissions/${submissionId}/files/${fileId}/download`);
 
       if (res.downloadUrl) {
-        window.open(res.downloadUrl, "_blank");
+        const response = await fetch(res.downloadUrl);
+        if (!response.ok) {
+          if (response.status === 403) {
+            throw new Error("Access Denied (403). Backend IAM user 'devkizito' lacks s3:GetObject permission.");
+          }
+          throw new Error("Network response was not ok");
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = res.fileName || "download";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
       } else {
         setActionError("File download not available.");
       }

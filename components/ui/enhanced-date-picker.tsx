@@ -41,8 +41,8 @@ export function EnhancedDatePicker({
   const [showTimePresets, setShowTimePresets] = useState(false);
 
   const currentDate = useMemo(() => {
-    return value ? dayjs(value) : dayjs();
-  }, [value]);
+    return value ? dayjs.tz(value, timezone) : dayjs().tz(timezone);
+  }, [value, timezone]);
 
   const quickSelectOptions = useMemo(() => {
     const now = dayjs();
@@ -92,19 +92,6 @@ export function EnhancedDatePicker({
 
   const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-
-    // Validate: don't allow past dates (compare in user's timezone)
-    if (newValue) {
-      const selectedDate = dayjs.tz(newValue, timezone);
-      const now = dayjs().tz(timezone);
-      if (selectedDate.isBefore(now, "minute")) {
-        // Auto-correct to now if past date selected
-        const corrected = formatForDateTimeLocal(now, timezone);
-        onChange(corrected);
-        return;
-      }
-    }
-
     onChange(newValue);
   };
 

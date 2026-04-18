@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import { useMemo, useCallback, useState, Fragment } from "react";
@@ -954,7 +953,9 @@ import {
   AlertCircle,
   Loader2,
   List,
+  X,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import clsx from "clsx";
 import { CalendarColumn } from "@/components/calendar/calendar-column";
 import { CalendarItem } from "@/components/calendar/calendar-item";
@@ -1106,19 +1107,23 @@ function WeekView({
     }
     return days;
   }, [weekStart]);
+  const scrollHandlers = useScrollPropagation();
 
   return (
     <div className="flex flex-col text-slate-200 min-h-full">
       <div
         className="flex-1 relative h-full overflow-x-auto overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
+        {...scrollHandlers}
       >
         <div
-          className="grid [grid-template-columns:136px_repeat(7,160px)] md:[grid-template-columns:136px_repeat(7,_minmax(0,_1fr))] gap-[4px] rounded-[10px] absolute h-full start-0 top-0 w-max md:w-full"
+          className="grid [grid-template-columns:136px_repeat(7,160px)] md:[grid-template-columns:136px_repeat(7,_minmax(0,_1fr))] gap-[4px] rounded-[10px] min-h-full w-max md:w-full"
         >
           <div className="z-10 bg-slate-900/80 flex justify-center items-center flex-col h-[62px] rounded-[8px] sticky top-0 border border-slate-800/50"></div>
           {localizedDays.map((day) => {
-            const isToday = day.date.isSame(dayjs(), "day");
+            const isToday = userTimezone 
+              ? day.date.isSame(dayjs().tz(userTimezone), "day")
+              : day.date.isSame(dayjs(), "day");
             return (
               <div
                 key={day.name}
@@ -1188,8 +1193,9 @@ function MonthView({
     publishPost,
     setDisplay,
     navigateToDate,
+    timezone: userTimezone,
   } = useCalendar();
-  const monthStart = dayjs(startDate).startOf("month");
+  const monthStart = userTimezone ? dayjs.tz(startDate, userTimezone).startOf("month") : dayjs(startDate).startOf("month");
   const [wideMonth, setWideMonth] = useState(() => {
     if (typeof window === "undefined") return false;
     try {
@@ -1227,8 +1233,7 @@ function MonthView({
 
   const calendarDays = useMemo(() => {
     const currentMonth = monthStart.month();
-    const currentYear = monthStart.year();
-    const startOfMonth = dayjs(new Date(currentYear, currentMonth, 1));
+    const startOfMonth = monthStart.startOf("month");
     const startDayOfWeek = startOfMonth.isoWeekday();
     const daysBeforeMonth = startDayOfWeek - 1;
     const calendarStartDate = startOfMonth.subtract(daysBeforeMonth, "day");
@@ -1237,22 +1242,24 @@ function MonthView({
     let currentDay = calendarStartDate;
     for (let i = 0; i < 42; i++) {
       let label = "current-month";
-      if (currentDay.month() < currentMonth) label = "previous-month";
-      if (currentDay.month() > currentMonth) label = "next-month";
+      const currentDayMonth = currentDay.month();
+      if (currentDayMonth < currentMonth) label = "previous-month";
+      else if (currentDayMonth > currentMonth) label = "next-month";
+      
       calendarDays.push({
-        day: currentDay,
+        day: userTimezone ? dayjs.tz(currentDay, userTimezone) : currentDay,
         label,
       });
       currentDay = currentDay.add(1, "day");
     }
     return calendarDays;
-  }, [monthStart]);
+  }, [monthStart, userTimezone]);
 
   const gridClassName = clsx(
-    "grid grid-rows-[62px_auto] gap-[4px] rounded-[10px] absolute start-0 top-0",
+    "grid gap-[2px] rounded-[10px]",
     wideMonth
-      ? "[grid-template-columns:repeat(7,160px)] w-max h-full"
-      : "grid-cols-7 w-full h-full min-w-[700px]",
+      ? "[grid-template-columns:repeat(7,160px)] w-max min-h-full"
+      : "grid-cols-7 w-full min-h-full min-w-[700px]",
   );
 
   return (
@@ -1268,32 +1275,38 @@ function MonthView({
         </Button>
       </div>
       <div
-        className="flex-1 flex relative h-full overflow-x-auto overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
+        className="flex-1 relative overflow-auto pb-12 [scrollbar-width:thin] [scrollbar-color:theme(colors.slate.700)_transparent]"
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
-        <div className={gridClassName}>
+        <div 
+          className={gridClassName}
+          style={{ gridAutoRows: 'minmax(110px, auto)' }}
+        >
           {localizedDays.map((day) => (
             <div
               key={day}
-              className="z-[20] p-2 bg-slate-900/80 flex justify-center items-center flex-col h-[62px] rounded-[8px] sticky top-0 border border-slate-800/50"
+              className="z-[30] p-2 bg-slate-900 border-b border-slate-800 flex justify-center items-center h-[52px] sticky top-0"
             >
-              <div className="text-[14px] font-medium text-slate-400">
+              <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
                 {day}
               </div>
             </div>
           ))}
           {calendarDays.map((date, index) => {
             const isCurrentMonth = date.label === "current-month";
-            const dayDate = dayjs(date.day).startOf("day");
-            const isToday = dayDate.isSame(dayjs(), "day");
+            const dayDate = userTimezone ? dayjs.tz(date.day, userTimezone).startOf("day") : dayjs(date.day).startOf("day");
+            const isToday = userTimezone 
+              ? dayDate.isSame(dayjs().tz(userTimezone), "day")
+              : dayDate.isSame(dayjs(), "day");
 
             return (
               <div
                 key={index}
                 className={clsx(
-                  "text-center items-center justify-center flex rounded-[8px]",
-                  !isCurrentMonth && "opacity-30",
-                  isToday && "border border-lime-500/30 bg-lime-500/5",
+                  "text-center min-h-[120px] sm:min-h-[140px] flex border-r border-b border-slate-800/60 transition-all duration-200",
+                  !isCurrentMonth && "bg-slate-950/40 opacity-30",
+                  isToday && "bg-emerald-500/5",
+                  isCurrentMonth && "hover:bg-slate-800/30"
                 )}
               >
                 <CalendarColumn
@@ -1348,11 +1361,13 @@ function DayView({
     const grouped: Record<number, typeof posts> = {};
     posts
       .filter((post) => {
-        const pDate = dayjs(post.scheduledFor);
+        const pDate = userTimezone ? dayjs.tz(post.scheduledFor, userTimezone) : dayjs(post.scheduledFor);
         return pDate.isSame(selectedDate, "day");
       })
       .forEach((post) => {
-        const hour = dayjs(post.scheduledFor).hour();
+        const hour = userTimezone 
+          ? dayjs.tz(post.scheduledFor, userTimezone).hour() 
+          : dayjs(post.scheduledFor).hour();
         if (!grouped[hour]) {
           grouped[hour] = [];
         }
@@ -1362,9 +1377,9 @@ function DayView({
     // Sort posts within each hour
     Object.keys(grouped).forEach((hour) => {
       grouped[Number(hour)].sort((a, b) => {
-        return (
-          dayjs(a.scheduledFor).valueOf() - dayjs(b.scheduledFor).valueOf()
-        );
+        const dateA = userTimezone ? dayjs.tz(a.scheduledFor, userTimezone) : dayjs(a.scheduledFor);
+        const dateB = userTimezone ? dayjs.tz(b.scheduledFor, userTimezone) : dayjs(b.scheduledFor);
+        return dateA.valueOf() - dateB.valueOf();
       });
     });
 
@@ -1427,13 +1442,14 @@ function DayView({
           {hours.map((hour) => {
             const hourPosts = postsByHour[hour] || [];
             const hourDate = selectedDate.hour(hour).minute(0);
-            const isPast = hourDate.isBefore(dayjs(), "minute");
+            const now = userTimezone ? dayjs().tz(userTimezone) : dayjs();
+            const isPast = hourDate.isBefore(now, "minute");
 
             return (
               <div key={hour} className="flex gap-3 items-start">
                 {/* Timestamp on left */}
-                <div className="w-16 flex-shrink-0 pt-2">
-                  <span className="text-sm font-medium text-slate-400">
+            <div className="w-16 flex-shrink-0 pt-3 text-right pr-2">
+                  <span className="text-xs font-black uppercase tracking-tighter text-slate-500">
                     {convertTimeFormat(hour)}
                   </span>
                 </div>
@@ -1473,6 +1489,8 @@ export default function EnhancedCalendar() {
     createPost,
     updatePost,
     movePost,
+    // Explicitly destructure timezone as userTimezone to be used in children
+    timezone: userTimezone,
   } = useCalendar();
   const { session } = useSessionContext();
   const isAdmin = session?.role === "ADMIN" || session?.role === "SUPER_ADMIN";
@@ -1489,18 +1507,20 @@ export default function EnhancedCalendar() {
   } | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [viewingPostId, setViewingPostId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
   const { uploadFile, uploading } = useUpload();
+  const { toast } = useToast();
 
   const handleAddPost = useCallback((date?: Dayjs) => {
-    setModalDate(date ?? dayjs());
+    const defaultDate = userTimezone ? dayjs().tz(userTimezone) : dayjs();
+    setModalDate(date ?? defaultDate);
     setModalOpen(true);
-  }, []);
+  }, [userTimezone]);
 
   const handleCreatePost = useCallback(
     async (payload: {
       caption: string;
-      scheduledFor: Date;
+      scheduledFor: string;
       socialAccountIds: string[];
       platforms: string[];
       assetId?: string;
@@ -1536,15 +1556,19 @@ export default function EnhancedCalendar() {
             ...(payload.hashtags ? { hashtags: payload.hashtags } : {}),
           });
         }
-        setError(null);
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Failed to save post";
-        setError(message);
-        throw err; // rethrow so PostModal can catch and show error inside the modal
+        toast({
+          title: editingPost ? "Post Updated" : "Post Scheduled",
+          description: "Your post has been successfully saved.",
+        });
+        setModalOpen(false);
+      } catch (err: any) {
+        console.error("Calendar Action Error:", err);
+        const message = err.message || "Failed to save post";
+        toast({ title: "Error", description: message, variant: "destructive" });
+        throw err;
       }
     },
-    [createPost, updatePost, editingPost],
+    [createPost, updatePost, editingPost, toast],
   );
 
   const handleViewPost = useCallback((postId: string) => {
@@ -1559,9 +1583,11 @@ export default function EnhancedCalendar() {
 
       // Prevent editing posted content
       if (post.status === "POSTED") {
-        setError(
-          "Cannot edit posts that have already been published. Please duplicate the post to create a new version.",
-        );
+        toast({
+          title: "Update Prevented",
+          description: "Cannot edit posts that have already been published. Please duplicate the post to create a new version.",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -1583,39 +1609,45 @@ export default function EnhancedCalendar() {
             ? [post.hashtags]
             : [],
       });
-      // post.scheduledFor is already in user timezone
-      setModalDate(dayjs(post.scheduledFor));
+      // post.scheduledFor is already in user timezone from fetchPosts conversion
+      setModalDate(userTimezone ? dayjs.tz(post.scheduledFor, userTimezone) : dayjs(post.scheduledFor));
       setModalOpen(true);
     },
-    [posts],
+    [posts, userTimezone, toast],
   );
 
   const handleDragEnd = useCallback(
     async (postId: string, newDate: Date) => {
       try {
-        const targetDate = dayjs(newDate);
-        const now = dayjs();
+        const targetDate = userTimezone ? dayjs.tz(newDate, userTimezone) : dayjs(newDate);
+        const now = userTimezone ? dayjs().tz(userTimezone) : dayjs();
 
         // Validate: cannot move to past dates (before current minute)
         if (targetDate.isBefore(now, "minute")) {
-          setError(
-            "Cannot schedule posts in the past. Please select a current or future date/time.",
-          );
+          toast({
+            title: "Invalid Move",
+            description: "Cannot schedule posts in the past. Please select a current or future date/time.",
+            variant: "destructive"
+          });
           return;
         }
 
         await movePost(postId, targetDate);
-        setError(null);
+        toast({ title: "Post Rescheduled", description: `Item moved to ${targetDate.format("MMM D, HH:mm")}` });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to move post");
+        toast({
+          title: "Error",
+          description: err instanceof Error ? err.message : "Failed to move post",
+          variant: "destructive"
+        });
       }
     },
-    [movePost],
+    [movePost, userTimezone, toast],
   );
 
   const formatDateRange = () => {
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
+    const start = userTimezone ? dayjs.tz(startDate, userTimezone) : dayjs(startDate);
+    const end = userTimezone ? dayjs.tz(endDate, userTimezone) : dayjs(endDate);
 
     if (display === "day") {
       return start.format("MMMM D, YYYY");
@@ -1641,6 +1673,33 @@ export default function EnhancedCalendar() {
 
   return (
     <DndProvider backend={dndBackend}>
+      {showDebug && (
+        <div className="mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/5 text-amber-200 text-xs font-mono space-y-1 relative group">
+          <div className="flex justify-between items-start">
+            <h4 className="font-bold text-amber-400 mb-2">Timezone Debugger</h4>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowDebug(false)}
+              className="h-6 w-6 p-0 hover:bg-amber-500/20 text-amber-400"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">
+            <p>Target Timezone: <span className="text-white bg-slate-800 px-1 rounded">{userTimezone || "BROWSER_DEFAULT"}</span></p>
+            <p>Browser Timezone: <span className="text-white">{Intl.DateTimeFormat().resolvedOptions().timeZone}</span></p>
+            <p>Current Time (Local): <span className="text-white">{dayjs().format("YYYY-MM-DD HH:mm:ss")}</span></p>
+            <p>Current Time (Locked): <span className="text-white">{userTimezone ? dayjs().tz(userTimezone).format("YYYY-MM-DD HH:mm:ss") : "N/A"}</span></p>
+            <p>UTC Now: <span className="text-white">{dayjs().utc().format("YYYY-MM-DD HH:mm:ss")} Z</span></p>
+          </div>
+          <div className="mt-2 pt-2 border-t border-amber-500/20">
+            <p className="text-[10px] text-amber-400/70 font-sans italic">
+              Tip: If "Current Time (Locked)" doesn't match your wall clock, check your Business Settings.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1715,6 +1774,16 @@ export default function EnhancedCalendar() {
             </div>
 
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDebug(!showDebug)}
+              className="h-9 w-9 p-0 border border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-slate-400 hover:text-amber-400"
+              title="Toggle Timezone Debugger"
+            >
+              <AlertCircle className="h-4 w-4" />
+            </Button>
+
+            <Button
               onClick={() => handleAddPost()}
               className="bg-lime-400 hover:bg-lime-500 text-black flex-1 sm:flex-initial"
             >
@@ -1763,24 +1832,9 @@ export default function EnhancedCalendar() {
           </Card>
         </div>
 
-        {/* Error Banner */}
-        {error && (
-          <div className="rounded-lg border border-rose-600/50 bg-rose-950/30 px-4 py-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-            <AlertCircle className="h-4 w-4 text-rose-500" />
-            <p className="text-sm text-rose-300">{error}</p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setError(null)}
-              className="ml-auto h-6 w-6 p-0"
-            >
-              ×
-            </Button>
-          </div>
-        )}
-
-        {/* Calendar */}
-        <Card className="border-slate-800/50 bg-slate-900/40">
+        {/* Calendar Area */}
+        <div className="mt-8">
+          <Card className="border-slate-800/50 bg-slate-900/40">
           <CardContent className="p-4 sm:p-6 min-h-[600px]">
             {loading ? (
               <div className="flex items-center justify-center h-64">
@@ -1790,25 +1844,25 @@ export default function EnhancedCalendar() {
                 </div>
               </div>
             ) : (
-              <div className="h-[600px] sm:h-[700px]">
+              <div className="min-h-[600px] flex flex-col">
                 {display === "day" && (
                   <DayView
                     onAddPost={handleAddPost}
-                    onEdit={handleViewPost}
+                    onEdit={handleEditPost}
                     onDragEnd={handleDragEnd}
                   />
                 )}
                 {display === "week" && (
                   <WeekView
                     onAddPost={handleAddPost}
-                    onEdit={handleViewPost}
+                    onEdit={handleEditPost}
                     onDragEnd={handleDragEnd}
                   />
                 )}
                 {display === "month" && (
                   <MonthView
                     onAddPost={handleAddPost}
-                    onEdit={handleViewPost}
+                    onEdit={handleEditPost}
                     onDragEnd={handleDragEnd}
                   />
                 )}
@@ -1816,13 +1870,13 @@ export default function EnhancedCalendar() {
             )}
           </CardContent>
         </Card>
+        </div>
 
         <PostModal
           open={modalOpen}
           onClose={() => {
             setModalOpen(false);
             setEditingPost(null);
-            setError(null);
           }}
           initialDate={modalDate}
           editingPost={editingPost}
@@ -1854,4 +1908,3 @@ export default function EnhancedCalendar() {
     </DndProvider>
   );
 }
->>>>>>> xerox

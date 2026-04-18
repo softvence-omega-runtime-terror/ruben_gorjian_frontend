@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+
 
 type Session = {
   id?: string;
@@ -48,5 +49,6 @@ export function useSession(): SessionState {
     fetchSession();
   }, [fetchSession]);
 
-  return { loading, session, error, refresh: fetchSession };
+  return useMemo(() => ({ loading, session, error, refresh: fetchSession }), [loading, session, error, fetchSession]);
 }
+

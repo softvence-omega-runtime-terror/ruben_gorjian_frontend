@@ -37,9 +37,9 @@ const FooterSecondary = dynamicImport(
 type BillingCycle = "monthly" | "yearly";
 
 const PLAN_SUBTITLES: Record<PlanKey, string> = {
-  "FMP-20": "Done-for-you management at starter volume.",
-  "FMP-35": "Our most selected full management tier.",
-  "FM-70": "High-output execution for multi-client agencies.",
+  "FMP-20": "Complete done-for-you posting",
+  "FMP-35": "More content. Broader reach.",
+  "FM-70": "Your dedicated digital marketing team",
 };
 
 const PLAN_BADGES: Partial<Record<PlanKey, string>> = {
@@ -174,7 +174,7 @@ function PricingPageContent() {
         displayPrice: active,
         billingNote:
           billingCycle === "monthly"
-            ? "Billed monthly"
+            ? "Per month"
             : `Billed annually (${formatPrice(yearlyMonthlyEquivalent * 12)}/year)`,
       };
     }).filter(Boolean) as Array<{
@@ -282,10 +282,10 @@ function PricingPageContent() {
                 </button>
               </div>
             </div>
-            <p className="mt-3 text-xs font-medium text-secondary">
+            {/* <p className="mt-3 text-xs font-medium text-secondary">
               Founder pricing: first 25 customers lock in 30% off for life
               before June 30, 2026.
-            </p>
+            </p> */}
           </div>
         </section>
 
@@ -344,7 +344,7 @@ function PricingPageContent() {
                         <span>{feature.label}</span>
                         <Tooltip
                           id={`pricing-tooltip-${key}`}
-                          className="max-w-xs"
+                          className="!bg-slate-900 max-w-xs !text-slate-200 !border !border-slate-800 !rounded-xl !p-3 !text-xs !shadow-2xl !opacity-100 z-50"
                         />
                       </li>
                     ))}

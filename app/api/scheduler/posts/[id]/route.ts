@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -189,14 +187,13 @@ export async function DELETE(
     );
   }
 }
->>>>>>> bfa5281 (fix the buidl error)
-=======
+
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const BACKEND_URL =
   process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  process.env.ANOTHER_BACKEND_API_URL ||
   "http://localhost:4000";
 
 export async function GET(
@@ -285,4 +282,4 @@ export async function DELETE(
     );
   }
 }
->>>>>>> xerox
+

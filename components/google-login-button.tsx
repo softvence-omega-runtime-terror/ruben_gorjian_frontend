@@ -26,6 +26,7 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
 
   const handleGoogleLogin = async () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
     if (!clientId) {
       setError("Google client ID not configured");
       return;
@@ -36,7 +37,7 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
 
     // Validate and store returnTo for OAuth callback
     const validatedReturnTo = validateReturnTo(finalReturnTo) || "/dashboard";
-    
+
     // Get plan selection from localStorage (primary source)
     let pendingPlanCode: string | null = null;
     if (typeof window !== "undefined") {
@@ -48,14 +49,17 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
     }
 
     // Include in OAuth state parameter (primary method for callback route)
-    const state = encodeURIComponent(JSON.stringify({ 
-      returnTo: validatedReturnTo,
-      pendingPlanCode: pendingPlanCode || undefined,
-    }));
+    const state = encodeURIComponent(
+      JSON.stringify({
+        returnTo: validatedReturnTo,
+        pendingPlanCode: pendingPlanCode || undefined,
+      }),
+    );
 
     const params = new URLSearchParams({
       client_id: clientId,
-      redirect_uri: `${window.location.origin}/api/auth/google/callback`,
+      // redirect_uri: `${window.location.origin}/api/auth/google/callback`,
+      redirect_uri: "http://138.68.251.5.nip.io:4000/api/auth/google/callback",
       response_type: "code",
       scope: "email profile",
       access_type: "online",
@@ -66,7 +70,7 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
     const popup = window.open(
       authUrl,
       "google-oauth",
-      "width=520,height=620,menubar=no,toolbar=no"
+      "width=520,height=620,menubar=no,toolbar=no",
     );
 
     if (!popup) {
@@ -98,7 +102,10 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
               }
             }
           }
-          if (window.location.pathname.startsWith("/login") || window.location.pathname.startsWith("/signup")) {
+          if (
+            window.location.pathname.startsWith("/login") ||
+            window.location.pathname.startsWith("/signup")
+          ) {
             window.location.href = redirectTo;
           }
         });
@@ -124,7 +131,10 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
                 }
               }
             }
-            if (window.location.pathname.startsWith("/login") || window.location.pathname.startsWith("/signup")) {
+            if (
+              window.location.pathname.startsWith("/login") ||
+              window.location.pathname.startsWith("/signup")
+            ) {
               window.location.href = redirectTo;
             }
           });
@@ -145,7 +155,10 @@ export function GoogleLoginButton({ returnTo, redirect }: Props) {
       disabled={loading}
       className="flex items-center justify-center gap-3 w-full px-4 py-3 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
-      <svg className="w-5 h-5" viewBox="0 0 24 24">
+      <svg
+        className="w-5 h-5"
+        viewBox="0 0 24 24"
+      >
         <path
           fill="#4285F4"
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

@@ -631,7 +631,7 @@ export default function AdminSettingsPage() {
                 </Badge>
                 <Badge
                   variant="outline"
-                  className="bg-blue-400/10 border-blue-400/20 text-blue-400"
+                  className="bg-blue-400/10 border-blue-400/20 text-white"
                 >
                   Upload-Post:{" "}
                   {globalRoutingQuery.data?.modeCounts?.FORCE_UPLOAD_POST ??
@@ -695,9 +695,9 @@ export default function AdminSettingsPage() {
                         field: "useFacebook",
                       },
                       {
-                        id: "useLinkedin",
-                        label: "LinkedIn",
-                        field: "useLinkedin",
+                        id: "useTiktok",
+                        label: "TikTok",
+                        field: "useTiktok",
                       },
                     ].map((p) => (
                       <label

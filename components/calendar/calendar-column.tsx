@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import { memo, useCallback, useMemo, useState } from "react";
@@ -312,29 +311,45 @@ export const CalendarColumn = memo<CalendarColumnProps>(
     const [showAll, setShowAll] = useState(false);
 
     const postList = useMemo(() => {
+      const dateInTz = userTimezone ? getDate.tz(userTimezone) : getDate;
+      const targetDay = dateInTz.format("YYYY-MM-DD");
+      
       return posts.filter((post) => {
+        // Special case: Failed posts should be counted in stats but hidden from the grid
+        // to satisfy the requirement that Admin 'Delete' (now mapping to FAILED) makes them disappear.
+        if (post.status === "FAILED") return false;
+
         const pDate = userTimezone ? dayjs.tz(post.scheduledFor, userTimezone) : dayjs(post.scheduledFor);
-        const check =
-          display === "day"
-            ? pDate.format("YYYY-MM-DD HH:mm") ===
-              getDate.format("YYYY-MM-DD HH:mm")
-            : display === "week"
-              ? pDate.isSame(getDate, "hour")
-              : pDate.isSame(getDate, "day");
-        return check;
+        
+        if (display === "day") {
+          return pDate.format("YYYY-MM-DD HH:mm") === dateInTz.format("YYYY-MM-DD HH:mm");
+        }
+        if (display === "week") {
+          return pDate.isSame(dateInTz, "hour");
+        }
+        
+        // Month view: compare YYYY-MM-DD strings for maximum reliability
+        return pDate.format("YYYY-MM-DD") === targetDay;
       });
     }, [posts, display, getDate, userTimezone]);
 
     // Allow current day in month view and current hour in day/week views.
     // Only block dates that are strictly in the past.
+    // Month view: block only days strictly before today in the user's timezone
+    const isToday = useMemo(() => {
+      const now = userTimezone ? dayjs().tz(userTimezone) : dayjs();
+      const dateInTz = userTimezone ? getDate.tz(userTimezone) : getDate;
+      return dateInTz.isSame(now, "day");
+    }, [getDate, userTimezone]);
+
     const isBeforeNow = useMemo(() => {
       const now = userTimezone ? dayjs().tz(userTimezone) : dayjs();
+      const dateInTz = userTimezone ? getDate.tz(userTimezone) : getDate;
+      
       if (display === "month") {
-        // Block only days strictly before today
-        return getDate.startOf("day").isBefore(now.startOf("day"));
+        return dateInTz.startOf("day").isBefore(now.startOf("day"));
       }
-      // For day/week, block hours strictly before the current hour
-      return getDate.startOf("hour").isBefore(now.startOf("hour"));
+      return dateInTz.startOf("hour").isBefore(now.startOf("hour"));
     }, [getDate, display, userTimezone]);
 
     const list = useMemo(() => {
@@ -375,18 +390,16 @@ export const CalendarColumn = memo<CalendarColumnProps>(
     return (
       <div
         className={clsx(
-          "flex flex-col w-full min-h-[70px] relative",
+          "flex flex-col w-full h-full relative group transition-colors",
           isBeforeNow && "opacity-60",
-          isBeforeNow
-            ? "cursor-not-allowed"
-            : "border border-slate-800/50 rounded-[8px]"
+          !isBeforeNow && "hover:bg-slate-800/20"
         )}
         ref={dropRef}
       >
         {display === "month" && (
           <div
             className={clsx(
-              "pt-[6px] text-[14px] text-slate-300 px-1",
+              "pt-2 pb-1 text-[13px] font-bold text-slate-400 px-3 flex justify-between items-center",
               onDayClick && "cursor-pointer hover:text-white transition-colors"
             )}
             onClick={(e) => {
@@ -394,7 +407,12 @@ export const CalendarColumn = memo<CalendarColumnProps>(
               onDayClick?.();
             }}
           >
-            {getDate.date()}
+            <span className={clsx(
+               "w-6 h-6 flex items-center justify-center rounded-full leading-none",
+               isToday && "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+            )}>
+              {getDate.date()}
+            </span>
           </div>
         )}
         <div
@@ -405,7 +423,7 @@ export const CalendarColumn = memo<CalendarColumnProps>(
         >
           <div
             className={clsx(
-              "flex-col text-[12px] pointer w-full flex overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900",
+              "flex-col text-[12px] pointer w-full flex",
               isBeforeNow ? "flex-1" : "cursor-pointer",
               isBeforeNow && postList.length === 0 && "min-h-[40px]"
             )}
@@ -484,4 +502,4 @@ export const CalendarColumn = memo<CalendarColumnProps>(
 );
 
 CalendarColumn.displayName = "CalendarColumn";
->>>>>>> xerox
+

@@ -1,8 +1,8 @@
 // Access env vars directly (not through function) so Next.js can replace them at build time
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  process.env.ANOTHER_BACKEND_API_URL ||
   process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.API_URL ||
   "";
 
 function buildUrl(path: string) {

@@ -1,0 +1,34 @@
+# Node modules (will be installed in builder stage)
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+yarn.lock
+
+# Local environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs and temporary files
+*.log
+*.tsbuildinfo
+*.swp
+.DS_Store
+.vscode
+.idea
+*.bak
+
+# Next.js build output (copied manually from builder)
+.next
+
+# Optional: exclude tests and other dev stuff
+tests
+coverage
+*.spec.ts
+*.test.ts
+
+# Git files
+.git
+.gitignore
